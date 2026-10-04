@@ -1,0 +1,794 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Aethra</title>
+<style>
+:root{--ac:#7c5cff;--ac2:#22d3ee;--rd:#ef4466;--gr:#2ecc8f;--r:12px}
+body[data-theme=dark]{--b0:#0a0b10;--b1:#10121a;--b2:#151722;--b3:#1c1f2e;--b4:#262a3d;--tx:#e8eaf6;--mu:#8a90ab;--bd:#ffffff14}
+body[data-theme=midnight]{--b0:#000;--b1:#040406;--b2:#09090d;--b3:#111117;--b4:#1a1a23;--tx:#e8eaf6;--mu:#80859e;--bd:#ffffff12}
+body[data-theme=light]{--b0:#e4e6f3;--b1:#eceef8;--b2:#fff;--b3:#f2f3fa;--b4:#e4e6f2;--tx:#1a1c2b;--mu:#666b85;--bd:#00000014}
+*{box-sizing:border-box}html,body{height:100%;margin:0}
+body{background:var(--b2);color:var(--tx);font:15px/1.45 Inter,system-ui,-apple-system,"Segoe UI",sans-serif;display:flex;overflow:hidden}
+::-webkit-scrollbar{width:8px}::-webkit-scrollbar-thumb{background:var(--b4);border-radius:8px}
+button,input,select,textarea{font:inherit;color:var(--tx)}
+button{cursor:pointer;border:0;border-radius:10px;background:linear-gradient(135deg,var(--ac),var(--ac2));padding:8px 14px;color:#fff;font-weight:600;transition:.15s}
+button:hover{filter:brightness(1.1);transform:translateY(-1px)}button.g{background:var(--b4);color:var(--tx)}button.r{background:var(--rd)}
+input,select,textarea{background:var(--b1);border:1px solid var(--bd);border-radius:10px;padding:9px 12px;width:100%;outline:0}
+input:focus,textarea:focus,select:focus{border-color:var(--ac)}input[type=checkbox]{width:auto}input[type=color]{padding:2px;height:36px;width:60px}
+#rail{width:72px;background:var(--b0);display:flex;flex-direction:column;align-items:center;gap:10px;padding:12px 0;overflow-y:auto;flex:none}
+.sv{width:48px;height:48px;border-radius:16px;background:var(--g,var(--b3));display:flex;align-items:center;justify-content:center;font-weight:700;color:#fff;cursor:pointer;transition:.2s;flex:none;position:relative}
+.sv:hover,.sv.on{border-radius:24px;box-shadow:0 0 0 2px var(--ac)}.sv.on::before{content:'';position:absolute;left:-12px;width:5px;height:28px;border-radius:0 5px 5px 0;background:var(--tx)}
+.sv.hm{background:var(--b3)}.sv.add{background:var(--b3);color:var(--gr);font-size:22px}
+.orb{width:28px;height:28px;border-radius:50%;background:conic-gradient(from 200deg,var(--ac),var(--ac2),#f472b6,var(--ac));box-shadow:0 0 14px var(--ac)}.orb.big{width:64px;height:64px;margin:0 auto 8px}
+.sep{width:30px;height:2px;background:var(--bd);border-radius:2px}
+.nb{background:var(--rd);color:#fff;border-radius:10px;font-size:11px;padding:0 6px;min-width:18px;text-align:center}.sv .nb{position:absolute;right:-4px;bottom:-4px}
+#side{width:264px;background:var(--b1);display:flex;flex-direction:column;flex:none;border-right:1px solid var(--bd)}
+#sn{padding:12px;border-bottom:1px solid var(--bd);font-weight:700;display:flex;justify-content:space-between;align-items:center;cursor:pointer;min-height:52px}
+#sn:hover{background:var(--b3)}#chs{flex:1;overflow-y:auto;padding:8px}
+.fq{padding:7px 10px;font-size:13px}.nvb,.ch{padding:7px 10px;border-radius:9px;color:var(--mu);cursor:pointer;display:flex;gap:8px;align-items:center}
+.nvb:hover,.ch:hover{background:var(--b3);color:var(--tx)}.nvb.on,.ch.on{background:var(--b4);color:var(--tx)}.ch .nb,.nvb .nb{margin-left:auto}
+.cat{font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--mu);margin:14px 6px 4px;font-weight:700;cursor:pointer;display:flex;justify-content:space-between}
+.ch .gear{margin-left:auto;display:none}.ch:hover .gear{display:inline}.vu{margin-left:30px;font-size:13px;color:var(--mu)}
+.dmr{padding:6px 8px}.dn{display:flex;flex-direction:column;min-width:0;line-height:1.2}.dn span,.dn b{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}small{color:var(--mu);font-size:12px}.pad{padding:8px}
+#dock{background:var(--b0);padding:8px;display:flex;align-items:center;gap:8px}#dock .me{flex:1;min-width:0;cursor:pointer;display:flex;gap:8px;align-items:center;padding:4px;border-radius:8px}#dock .me:hover{background:var(--b3)}
+.ib{cursor:pointer;padding:5px 7px;border-radius:8px;color:var(--mu)}.ib:hover{background:var(--b4);color:var(--tx)}.ib.off{color:var(--rd)}
+.av{--s:38px;width:var(--s);height:var(--s);border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;color:#fff;flex:none;position:relative;font-size:calc(var(--s)*.42);text-shadow:0 1px 3px #0006}
+.av i{position:absolute;right:-1px;bottom:-1px;width:calc(var(--s)*.3);height:calc(var(--s)*.3);min-width:9px;min-height:9px;border-radius:50%;border:2.5px solid var(--b1)}
+#main{flex:1;display:flex;flex-direction:column;min-width:0;background:var(--b2)}
+#hd{height:52px;border-bottom:1px solid var(--bd);display:flex;align-items:center;gap:12px;padding:0 16px;font-weight:700;flex:none}#hd .sp{flex:1}
+.sq{width:170px;padding:5px 10px;font-size:13px}.tb2{padding:4px 12px;border-radius:8px;color:var(--mu);cursor:pointer;font-weight:600;font-size:14px}.tb2:hover{background:var(--b3)}.tb2.on{background:var(--b4);color:var(--tx)}
+#msgs{flex:1;overflow-y:auto;padding:12px 18px 6px}
+.m{display:flex;gap:14px;padding:3px 8px;margin:0 -8px;border-radius:8px;position:relative;animation:in .2s}.m:hover{background:var(--b3)}.m.grp{padding-top:0}.m.grp .gt{width:40px;font-size:10px;color:transparent;text-align:center;flex:none;padding-top:4px}.m.grp:hover .gt{color:var(--mu)}
+@keyframes in{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:none}}
+.mb{min-width:0;flex:1}.mh b{cursor:pointer}.mh b:hover{text-decoration:underline}.mt{font-size:11px;color:var(--mu);margin-left:8px}.tx{word-break:break-word;white-space:pre-wrap}
+.tx code{background:var(--b1);padding:1px 5px;border-radius:5px;font-size:.9em}.tx a{color:var(--ac2)}.mn{background:#7c5cff33;color:var(--ac);border-radius:4px;padding:0 3px}.invl{cursor:pointer;display:inline-block;background:var(--b4);padding:6px 12px;border-radius:8px;color:var(--ac2)!important}
+.tag{background:var(--ac);color:#fff;border-radius:4px;font-size:10px;padding:0 5px;margin-left:6px}
+.tb{display:none;position:absolute;right:10px;top:-14px;background:var(--b4);border:1px solid var(--bd);border-radius:10px;padding:2px 4px;gap:2px}.m:hover .tb{display:flex}.tb span{cursor:pointer;padding:2px 6px;border-radius:6px}.tb span:hover{background:var(--b3)}
+.rxs{display:flex;gap:5px;flex-wrap:wrap;margin-top:4px}.rx{background:var(--b4);border:1px solid transparent;border-radius:10px;padding:0 8px;font-size:13px;cursor:pointer}.rx.me{border-color:var(--ac);background:#7c5cff26}
+.ds{display:flex;align-items:center;gap:10px;color:var(--mu);font-size:12px;margin:14px 0 6px}.ds::before,.ds::after{content:'';flex:1;height:1px;background:var(--bd)}
+.ei{margin:2px 0}#typ{height:20px;padding:0 20px;font-size:12px;color:var(--mu)}
+#cmp{padding:0 16px 16px;display:flex;gap:8px}#cmp .box{flex:1;display:flex;align-items:center;background:var(--b3);border-radius:12px;border:1px solid var(--bd)}#cmp input{background:none;border:0;padding:12px 14px}
+#mem{width:268px;background:var(--b1);overflow-y:auto;padding:8px;flex:none;border-left:1px solid var(--bd)}
+.mm{display:flex;align-items:center;gap:10px;padding:5px 8px;border-radius:9px;cursor:pointer}.mm:hover{background:var(--b3)}.mm.off{opacity:.45}
+.empty{text-align:center;color:var(--mu);margin:60px auto;max-width:340px}.empty div{font-size:54px}
+.card{background:var(--b3);border:1px solid var(--bd);border-radius:var(--r);padding:12px 14px;margin:8px 0;cursor:pointer;transition:.15s}.card:hover{border-color:var(--ac);transform:translateY(-1px)}
+.fr{display:flex;align-items:center;gap:12px;padding:10px;border-radius:10px;border-top:1px solid var(--bd);cursor:pointer}.fr:hover{background:var(--b3)}.fr .dn{flex:1}.acts{display:flex;gap:6px}.acts span{background:var(--b4);width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center}.acts span:hover{background:var(--ac)}
+h5{margin:14px 0 4px;color:var(--mu);text-transform:uppercase;font-size:11px;letter-spacing:.06em}
+#modal{position:fixed;inset:0;background:#000a;backdrop-filter:blur(4px);display:none;align-items:center;justify-content:center;z-index:10;padding:10px}
+.mdl{background:var(--b2);border:1px solid var(--bd);border-radius:16px;width:min(540px,100%);max-height:92vh;overflow-y:auto;padding:20px;position:relative;animation:pop .18s;box-shadow:0 20px 60px #000a}
+@keyframes pop{from{opacity:0;transform:scale(.96)}}.mdl.wide{width:min(900px,100%);padding:0}.mdl.prof{width:min(400px,100%);padding:0;overflow:hidden}
+.mdl .x{position:absolute;right:12px;top:10px;cursor:pointer;z-index:2;background:#0006;color:#fff;width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center}
+.sh{display:flex;min-height:480px}.nv{width:210px;background:var(--b1);padding:14px 10px;flex:none}.bd2{flex:1;padding:22px;min-width:0}
+.nvi{padding:8px 10px;border-radius:8px;cursor:pointer;color:var(--mu);display:flex;justify-content:space-between;align-items:center}.nvi:hover{background:var(--b3);color:var(--tx)}.nvi.on{background:var(--b4);color:var(--tx)}
+.rl2{display:grid;grid-template-columns:200px 1fr;gap:14px}.ar a{margin-left:6px;cursor:pointer}
+.mdl h2,.mdl h4{margin:.2em 0 .6em}.row{display:flex;gap:8px;margin:7px 0;align-items:center}.two{display:grid;grid-template-columns:1fr 1fr;gap:12px}.card2{background:var(--b3);border-radius:12px;padding:14px;display:flex;flex-direction:column;gap:8px}
+.pc{background:var(--b2)}.pbn{height:96px}.pav{margin:-44px 0 0 18px}.pav .av{border:5px solid var(--b2);box-sizing:content-box;margin-left:-5px}.pav .av i{border-color:var(--b2)}
+.pbd{padding:8px 18px 18px}.pnm{font-size:22px;font-weight:800}.pron{font-size:13px;color:var(--mu);font-weight:400}.bdgs{margin:4px 0}.bdgi{display:inline-block;background:var(--b3);border-radius:8px;padding:1px 6px;margin-right:4px;cursor:help}
+.cst{background:var(--b3);border-radius:12px;padding:6px 12px;margin:8px 0;display:inline-block}.pbd hr{border:0;border-top:1px solid var(--bd)}.pbd p{margin:2px 0}
+.chips{display:flex;gap:6px;flex-wrap:wrap}.chip{border:1px solid var(--c,var(--bd));color:var(--c,var(--tx));border-radius:999px;padding:1px 10px;font-size:12px;background:var(--b3)}.nt{font-size:13px}
+.sw input{display:none}.sw span{width:42px;height:24px;background:var(--b4);border-radius:12px;display:inline-block;position:relative;cursor:pointer;flex:none}
+.sw span:after{content:'';position:absolute;top:3px;left:3px;width:18px;height:18px;border-radius:50%;background:#fff;transition:.15s}.sw input:checked+span{background:var(--ac)}.sw input:checked+span:after{left:21px}
+.th{border:2px solid var(--bd);border-radius:12px;padding:16px 22px;cursor:pointer;display:inline-block;margin-right:8px}.th.on{border-color:var(--ac)}.dot{width:30px;height:30px;border-radius:50%;display:inline-block;margin:4px;cursor:pointer;border:3px solid transparent}.dot.on{border-color:var(--tx)}
+#log{overflow-y:auto;font:11px monospace;background:#000;color:#9f9;padding:8px;border-radius:8px;height:120px;white-space:pre-wrap}
+#toast{position:fixed;top:16px;left:50%;transform:translateX(-50%);background:var(--ac);color:#fff;padding:9px 16px;border-radius:12px;display:none;z-index:60;box-shadow:0 8px 24px #0008}
+.cm{position:fixed;background:var(--b1);border:1px solid var(--bd);border-radius:10px;padding:6px;min-width:230px;box-shadow:0 10px 30px #000a;z-index:50}
+.mi{position:relative;padding:7px 10px;border-radius:6px;display:flex;justify-content:space-between;gap:12px;cursor:pointer;font-size:14px}.mi small{display:block}
+.mi:hover{background:var(--ac);color:#fff}.mi:hover small{color:#fffb}.mi.red{color:var(--rd)}.mi.red:hover{background:var(--rd);color:#fff}.mi.off{opacity:.5;cursor:default}
+.cm hr{border:0;border-top:1px solid var(--bd);margin:4px 0}.sub{display:none;position:absolute!important;left:100%;top:-6px}.mi:hover>.sub{display:block}.fl .sub{left:auto;right:100%}
+.emo{display:grid;grid-template-columns:repeat(6,1fr);min-width:0;gap:2px}.emo span{font-size:22px;padding:4px;cursor:pointer;border-radius:6px;text-align:center}.emo span:hover{background:var(--b4)}
+.mu{color:var(--mu)}
+#auth{position:fixed;inset:0;z-index:100;display:flex;align-items:center;justify-content:center;background:radial-gradient(circle at 20% 20%,#7c5cff55,transparent 50%),radial-gradient(circle at 80% 80%,#22d3ee44,transparent 50%),#0a0b10}
+#auth .ac{width:min(380px,92vw);background:#151722ee;border:1px solid #ffffff1a;border-radius:20px;padding:30px;display:flex;flex-direction:column;gap:12px;text-align:center;color:#e8eaf6}
+#auth h1{margin:0;font-size:34px;letter-spacing:.02em;background:linear-gradient(135deg,#7c5cff,#22d3ee);-webkit-background-clip:text;color:transparent}#auth p{margin:0;color:#8a90ab}
+.atabs{display:flex;background:#0a0b10;border-radius:10px;padding:3px}.atabs span{flex:1;padding:7px;border-radius:8px;cursor:pointer;color:#8a90ab}.atabs span.on{background:#262a3d;color:#fff}.err{color:var(--rd);min-height:18px;font-size:13px}
+@media(max-width:900px){#mem{display:none}#side{width:210px}.rl2{grid-template-columns:1fr}}
+@media(max-width:600px){#side{display:none}.nv{width:110px}.two{grid-template-columns:1fr}}
+
+.bdgi{display:inline-flex;width:26px;height:26px;border-radius:9px;align-items:center;justify-content:center;background:linear-gradient(135deg,var(--c1),var(--c2));box-shadow:0 0 10px color-mix(in srgb,var(--c1) 55%,transparent),inset 0 1px 0 #fff5;margin-right:4px;cursor:help;font-size:14px}.bdgi img{width:18px;height:18px;object-fit:contain;border-radius:4px}
+.stf{display:inline-flex;gap:6px;align-items:center;background:color-mix(in srgb,var(--c1) 22%,transparent);color:var(--c1);border:1px solid var(--c1);border-radius:999px;padding:0 10px;font-size:12px;font-weight:700;margin:3px 0}.stf img{width:14px;height:14px}
+.av{background-size:cover}.aurav{box-shadow:0 0 0 2px #fbbf24,0 0 12px #fbbf2488}.aurc{box-shadow:inset 0 0 0 1px #fbbf2466}
+.gold{background:linear-gradient(90deg,#fbbf24,#f472b6);-webkit-background-clip:text;background-clip:text;color:transparent}.aurbox{background:linear-gradient(135deg,#fbbf2422,#f472b622);border:1px solid #fbbf2455;border-radius:14px;padding:14px}.perks li{margin:4px 0}
+.bar{height:8px;background:var(--b4);border-radius:8px;margin-top:8px;overflow:hidden}.bar div{height:100%;background:linear-gradient(90deg,var(--ac),var(--ac2))}
+.lv{background:linear-gradient(90deg,#fbbf24,#f472b6);color:#000;border-radius:6px;font-size:10px;padding:0 5px;font-weight:800}.sic{width:26px;height:26px;border-radius:8px;object-fit:cover}
+.rb{background:linear-gradient(90deg,#f33,#fb3,#3f6,#3bf,#a5f,#f33);background-size:200% 100%;-webkit-background-clip:text;background-clip:text;color:transparent;animation:rbm 3s linear infinite}@keyframes rbm{to{background-position:200% 0}}
+.sh2{background:linear-gradient(90deg,var(--c),#fff,var(--c));background-size:200% 100%;-webkit-background-clip:text;background-clip:text;color:transparent;animation:rbm 2.5s linear infinite}
+.m.hl{background:#fbbf2418;border-left:3px solid #fbbf24}.att{max-width:min(420px,100%);border-radius:10px;margin-top:4px;display:block}
+.pfx #main{animation:pfx 1.2s}@keyframes pfx{0%,60%{box-shadow:inset 0 0 0 3px #fbbf24,inset 0 0 40px #fbbf2455}100%{box-shadow:none}}
+#ann{display:none;background:linear-gradient(90deg,var(--ac),var(--ac2));color:#fff;padding:8px 16px;font-weight:600;align-items:center;flex:none}
+.vu.spk{color:var(--gr)}.vu.spk{text-shadow:0 0 8px var(--gr)}.vbar{display:flex;justify-content:space-between;align-items:center;padding:8px 12px;background:var(--b0);color:var(--gr);border-top:1px solid var(--bd)}
+.meter{flex:1;height:10px;background:var(--b4);border-radius:8px;overflow:hidden}.meter div{height:100%;width:0;background:var(--gr);transition:width .08s}
+.pgrid{display:grid;grid-template-columns:1fr 280px;gap:16px}.pvw{border:1px solid var(--bd);border-radius:14px;overflow:hidden;align-self:start}
+.tri{padding:3px 14px;background:var(--b4);color:var(--mu)}.tri.ok{background:var(--gr);color:#fff}.tri.no{background:var(--rd);color:#fff}.ow{border-collapse:collapse;width:100%}.ow td,.ow th{padding:5px 8px;text-align:center}.ow td:first-child{text-align:left}
+.fhead{position:sticky;top:-12px;background:var(--b2);padding:6px 0;z-index:2}.fcard{display:flex;gap:12px;background:var(--b3);border:1px solid var(--bd);border-radius:14px;padding:12px 14px;margin:8px 0;cursor:pointer;transition:.15s}.fcard:hover{border-color:var(--ac);transform:translateY(-1px)}.fcard.pin{border-color:#fbbf2466}
+.ft2{font-weight:700;font-size:16px}.fex{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:560px}.fst{display:flex;flex-direction:column;gap:4px;color:var(--mu);font-size:13px;text-align:right}
+.sacc{display:flex;align-items:center;gap:10px;background:#262a3d;border-radius:10px;padding:6px 10px;cursor:pointer;text-align:left;margin-top:6px}.sacc span{flex:1}
+#dock .dn small{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}#dock{gap:2px}#dock .me{flex:1 1 90px}.ib{flex:none}
+.tkm{max-height:300px;overflow-y:auto;margin:8px 0}body.cp .m{padding-top:0;padding-bottom:0}body.rm *{animation:none!important;transition:none!important}
+</style>
+</head>
+<body data-theme="dark">
+<div id="auth"><div class="ac"><div class="orb big"></div><h1>Aethra</h1><p id="tag"></p>
+<div class="atabs"><span id="tl" onclick="aTab(0)"></span><span id="tr" onclick="aTab(1)"></span></div>
+<input id="an" autocomplete="username"><input id="ap" type="password" autocomplete="current-password" onkeydown="if(event.key==='Enter')doAuth(AREG)">
+<div class="err" id="ae"></div><button id="ab" onclick="doAuth(AREG)"></button>
+<div class="mu"><span style="cursor:pointer" onclick="setL('ru')">RU</span> · <span style="cursor:pointer" onclick="setL('en')">EN</span></div></div></div>
+<div id="rail"></div>
+<div id="side"><div id="sn"></div><div id="chs"></div><div id="vb"></div><div id="dock"></div></div>
+<div id="main"><div id="hd"></div><div id="msgs"></div><div id="typ"></div>
+<div id="cmp"><div class="box"><input id="inp" autocomplete="off"><span class="ib" onclick="emoIn(event)">😊</span></div></div></div>
+<div id="mem"></div><div id="modal"></div><div id="toast"></div>
+
+<script>
+const P={ADMIN:1,CH:2,KICK:4,BAN:8,TO:16,MSG:32,SEND:64,VIEW:128,ROLES:256,ATTACH:512,PING:1024},PL=Object.keys(P);
+const T={
+tagline:['Общайтесь без границ','Talk without borders'],login:['Вход','Log in'],register:['Регистрация','Sign up'],username:['Имя пользователя','Username'],password:['Пароль','Password'],e_short:['Имя от 3 символов, пароль от 4','Name 3+ chars, password 4+'],e_exists:['Это имя уже занято','This name is taken'],e_cred:['Неверное имя или пароль','Wrong name or password'],e_inv:['Приглашение недействительно','Invalid invite'],e_ban:['Вы забанены на этом сервере','You are banned from this server'],
+home:['Главная','Home'],friends:['Друзья','Friends'],online:['В сети','Online'],all:['Все','All'],pending:['Ожидание','Pending'],addfriend:['Добавить в друзья','Add friend'],addhint:['Введите точное имя пользователя. Откройте второй аккаунт в другой вкладке, чтобы проверить чат!','Enter an exact username. Open a second account in another tab to try chat!'],sendreq:['Отправить запрос','Send request'],incoming:['Входящие','Incoming'],outgoing:['Исходящие','Outgoing'],nopend:['Нет ожидающих запросов','No pending requests'],nofr:['Друзей пока нет. Добавьте первого!','No friends yet. Add your first!'],noonl:['Никого нет в сети','Nobody is online'],dms:['Личные сообщения','Direct messages'],nodms:['Диалогов пока нет','No conversations yet'],find:['Найти или начать диалог','Find or start a conversation'],
+offline:['Не в сети','Offline'],idle:['Не активен','Idle'],dnd:['Не беспокоить','Do not disturb'],invisible:['Невидим','Invisible'],status:['Статус','Status'],
+dmstart:['Это начало вашего диалога с','This is the start of your conversation with'],blocked_n:['Отправка невозможна: пользователь заблокирован','Cannot send: user is blocked'],typing:['печатает…','is typing…'],edited:['изм.','edited'],search:['Поиск','Search'],reqsent:['Запрос отправлен','Request sent'],nouser:['Пользователь не найден','User not found'],already:['Уже в друзьях','Already friends'],
+profile:['Профиль','Profile'],mention:['Упомянуть','Mention'],dm:['Написать сообщение','Message'],call:['Начать звонок','Start call'],note:['Заметка','Note'],notehint:['Видна только вам','Visible only to you'],apps:['Приложения','Apps'],noapps:['Нет приложений','No apps'],invite:['Пригласить на сервер','Invite to server'],addfr:['Добавить в друзья','Add friend'],rmfr:['Удалить из друзей','Remove friend'],ignore:['Игнорировать','Ignore'],unignore:['Перестать игнорировать','Unignore'],block:['Заблокировать','Block'],unblock:['Разблокировать','Unblock'],roles:['Роли','Roles'],copyid:['Копировать ID пользователя','Copy user ID'],kick:['Кикнуть','Kick'],ban:['Забанить','Ban'],to:['Тайм-аут 1 мин','Timeout 1 min'],untimeout:['Снять тайм-аут','Remove timeout'],
+about:['Обо мне','About me'],since:['В Aethra с','Member since'],mutual:['Общие серверы','Mutual servers'],
+none:['Пусто','Empty'],noperm:['Недостаточно прав','Missing permissions'],copied:['Скопировано','Copied'],done:['Готово','Done'],saved:['Сохранено','Saved'],send403:['Нет права писать','No permission to send'],timeout:['Вы в тайм-ауте','You are timed out'],slow:['Медленный режим, сек.:','Slowmode, sec.:'],rl:['429: лимит запросов','429: rate limited'],msg:['Написать в #','Message #'],msgd:['Написать @','Message @'],members:['Участники','Members'],
+t_text:['Текстовый','Text'],t_voice:['Голосовой','Voice'],t_forum:['Форум','Forum'],
+acct:['Моя учётная запись','My account'],look:['Внешний вид','Appearance'],lang:['Язык','Language'],devs:['Разработчик','Developer'],logout:['Выйти','Log out'],name:['Имя','Name'],pron:['Местоимения','Pronouns'],custom:['Свой статус','Custom status'],bio:['О себе','About me'],avatar:['Цвет аватара','Avatar color'],banner:['Баннер (от)','Banner (from)'],banner2:['Баннер (до)','Banner (to)'],theme:['Тема','Theme'],accent:['Акцентный цвет','Accent color'],th_dark:['Тёмная','Dark'],th_light:['Светлая','Light'],th_midnight:['Полночь','Midnight'],
+devmode:['Режим разработчика','Developer mode'],devdesc:['Раскрывает элементы контекстного меню (копирование ID) и инспектор прав.','Reveals context menu items (copy ID) and the permission inspector.'],test:['Режим тестирования (mock WebSocket)','Test mode (mock WebSocket)'],testdesc:['Имитирует события gateway: чужие сообщения помечены TEST и не сохраняются.','Simulates gateway events: foreign messages are tagged TEST and not stored.'],rlsim:['Симулятор лимитов (429)','Rate-limit simulator (429)'],events:['События gateway','Gateway events'],inspect:['Инспектор прав на этом сервере','Permission inspector on this server'],
+addsrv:['Добавить сервер','Add a server'],create:['Создать','Create'],join:['Войти','Join'],srvname:['Название сервера','Server name'],
+sinvite:['Пригласить людей','Invite people'],ssettings:['Настройки сервера','Server settings'],mkch:['Создать канал','Create channel'],mkcat:['Создать категорию','Create category'],mkevent:['Создать событие','Create event'],threads:['Активные ветки','Active threads'],notif:['Параметры уведомлений','Notification settings'],privs:['Настройки конфиденциальности','Privacy settings'],editprof:['Профиль на сервере','Server profile'],copysid:['Копировать ID сервера','Copy server ID'],leave:['Покинуть сервер','Leave server'],delsrv:['Удалить сервер','Delete server'],muted:['Уведомления выключены','Notifications muted'],unmuted:['Уведомления включены','Notifications on'],nick:['Ник на сервере','Server nickname'],
+ov:['Обзор','Overview'],rls:['Роли','Roles'],chs:['Каналы','Channels'],invs:['Приглашения','Invites'],bans:['Баны','Bans'],audit:['Журнал аудита','Audit log'],evs:['События','Events'],desc:['Описание','Description'],
+newrole:['Новая роль','New role'],rname:['Название роли','Role name'],rcolor:['Цвет','Color'],rbadge:['Значок (эмодзи)','Badge (emoji)'],perms:['Права','Permissions'],del:['Удалить','Delete'],noedit:['Эту роль вам нельзя менять','You cannot edit this role'],hierhint:['Порядок = иерархия (сверху выше)','Order = hierarchy (top is highest)'],lastrole:['Нужна хотя бы одна роль','At least one role is required'],r_admin:['Админ','Admin'],r_mod:['Модератор','Moderator'],r_mem:['Участник','Member'],
+p_ADMIN:['Администратор','Administrator'],p_CH:['Управление каналами и сервером','Manage channels & server'],p_KICK:['Кик участников','Kick members'],p_BAN:['Бан участников','Ban members'],p_TO:['Тайм-ауты','Timeout members'],p_MSG:['Управление сообщениями','Manage messages'],p_SEND:['Отправка сообщений','Send messages'],p_VIEW:['Просмотр каналов','View channels'],p_ROLES:['Управление ролями','Manage roles'],
+chname:['Название','Name'],cat:['Категория','Category'],nocat:['Без категории','No category'],priv:['Приватный','Private'],slowm:['Медленный режим (сек.)','Slowmode (sec.)'],catname:['Название категории','Category name'],c_text:['Текстовые каналы','Text channels'],c_voice:['Голосовые каналы','Voice channels'],c_forum:['Форумы','Forums'],
+newpost:['Новый пост','New post'],ptitle:['Заголовок','Title'],pbody:['Текст поста','Post text'],reply:['Ответить…','Reply…'],back:['Назад','Back'],nopost:['Постов пока нет','No posts yet'],send:['Отправить','Send'],
+mkinv:['Создать приглашение','Create invite'],revoke:['Отозвать','Revoke'],unban:['Разбан','Unban'],evname:['Название события','Event name'],invmsg:['Приглашаю на сервер','Join my server'],invsent:['Приглашение отправлено в ЛС','Invite sent via DM'],joinsrv:['Присоединиться','Join server'],voiceon:['Голос подключён','Voice connected'],welcome:['Добро пожаловать в','Welcome to'],emptych:['Здесь пока тихо. Напишите первое сообщение!','Quiet here. Send the first message!']};
+const t=k=>(T[k]||[k,k])[L==='ru'?0:1];
+const ST={online:'#2ecc8f',idle:'#f0b232',dnd:'#ef4466'},ICON={text:'#',voice:'🔊',forum:'💬'};
+const BADGES={founder:['👑','Основатель платформы','Platform founder'],early:['🚀','Ранний участник','Early member'],owner:['🏰','Владелец сервера','Server owner'],social:['🤝','3+ друга','3+ friends'],dev:['🛠','Разработчик','Developer'],veteran:['💎','Ветеран (7+ дней)','Veteran (7+ days)']};
+const EM=['😀','😂','😍','🥰','😎','🤔','😢','😡','👍','👎','👏','🙏','🔥','🎉','💯','❤️','💜','✨','👀','🚀','🤝','😴','🤯','🥳'],COL=['#7c5cff','#22d3ee','#f472b6','#34d399','#fbbf24','#fb7185','#60a5fa'];
+const $=s=>document.querySelector(s);
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+let nc=0;const nid=()=>'i'+Date.now().toString(36)+(nc++);
+let DB,UID=null,L=localStorage.getItem('ae_lang')||'ru',AREG=0,PR={},evlog=[],timer,bc,lastTyp=0;const LAST={};
+const UI={v:'home',ch:null,dm:null,tab:'online',post:null,edit:null,fresh:1,q:'',tq:'',typ:{},mock:{},ref:null,mp:true,vc:null,mic:1,deaf:1};
+
+/* ---------- storage / sync ---------- */
+function load(){try{DB=JSON.parse(localStorage.getItem('aethra'))}catch(e){}if(!DB||!DB.users)DB={users:{},srv:{},dm:{},inv:{}}}
+function save(){try{localStorage.setItem('aethra',JSON.stringify(DB))}catch(e){}}
+function mut(fn){load();fn();save();render()}
+addEventListener('storage',e=>onStorage(e));
+try{bc=new BroadcastChannel('aethra');bc.onmessage=e=>{if(e.data.t==='typ'){UI.typ[e.data.r+':'+e.data.u]=Date.now();paintTyp()}}}catch(e){}
+const getPres=()=>{try{return JSON.parse(localStorage.getItem('ae_p')||'{}')}catch(e){return{}}};
+function beat(){if(!UID)return;try{const p=getPres();p[UID]=Date.now();localStorage.setItem('ae_p',JSON.stringify(p));PR=p}catch(e){}}
+setInterval(beat,4000);setInterval(()=>{if(UID)paintTyp()},1500);
+
+/* ---------- helpers ---------- */
+const U=id=>DB.users[id],ME=()=>DB.users[UID];
+const G=()=>DB.srv[UI.v],MR=u=>G().mem[u];
+const nm=(u,sid)=>{const g=sid?DB.srv[sid]:(UI.v!=='home'?G():null);return(g&&g.mem[u.id]&&g.mem[u.id].nick)||u.name};
+const topRole=u=>{const g=G(),r=MR(u).roles;return g.roles.find(x=>r.includes(x.id))||g.roles[g.roles.length-1]};
+const rpos=r=>G().roles.length-G().roles.indexOf(r);
+const perms=u=>MR(u).roles.reduce((a,id)=>a|(G().roles.find(r=>r.id===id)?.perm||0),0);
+const isOwner=u=>G().owner===u,can=(u,p)=>isOwner(u)||!!(perms(u)&1)||!!(perms(u)&p);
+const above=(a,b)=>a!==b&&b!==G().owner&&(isOwner(a)||rpos(topRole(a))>rpos(topRole(b)));
+const canEditRole=r=>isOwner(UID)||(can(UID,P.ROLES)&&rpos(r)<rpos(topRole(UID)));
+const need=p=>can(UID,p)||(toast(t('noperm'),1),false);
+const chan=()=>{const g=G();return g.ch.find(c=>c.id===UI.ch&&c.type!=='voice'&&canView(UID,c))||g.ch.find(c=>c.type!=='voice'&&canView(UID,c))};
+const dmKey=(a,b)=>[a,b].sort().join('_'),partner=k=>k.split('_').find(x=>x!==UID)||UID;
+const dmKeys=()=>Object.keys(DB.dm).filter(k=>k.split('_').includes(UID)&&DB.dm[k].length&&U(partner(k))).sort((a,b)=>DB.dm[b].at(-1).ts-DB.dm[a].at(-1).ts);
+const unread=k=>(DB.dm[k]||[]).filter(m=>m.u!==UID&&m.ts>(ME().read[k]||0)).length,totalUnread=()=>dmKeys().reduce((a,k)=>a+unread(k),0);
+const hidden=x=>ME().ig.includes(x.u)||ME().bl.includes(x.u);
+function badges(u){const b=[];if(u.founder)b.push('founder');if(u.early)b.push('early');if(Object.values(DB.srv).some(s=>s.owner===u.id))b.push('owner');if(u.fr.length>=3)b.push('social');if(u.dev)b.push('dev');if(Date.now()-u.ts>6048e5)b.push('veteran');return b}
+function ev(d,n,x){evlog.push(d+' '+n+' '+JSON.stringify(x).slice(0,80));if(evlog.length>50)evlog.shift();const l=$('#log');if(l){l.textContent=evlog.join('\n');l.scrollTop=1e9}}
+function toast(m,err){const e=$('#toast');e.textContent=m;e.style.background=err?'var(--rd)':'var(--ac)';e.style.display='block';clearTimeout(e._t);e._t=setTimeout(()=>e.style.display='none',2300)}
+function audit(a,tg){G().audit.unshift({a,by:nm(ME()),tg:tg||'',ts:new Date().toLocaleTimeString()});ev('audit',a,{tg})}
+function copy(x){try{navigator.clipboard.writeText(x).then(()=>toast(t('copied')),()=>prompt('',x))}catch(e){prompt('',x)}}
+function fmt(s){return esc(s).replace(/`([^`]+)`/g,'<code>$1</code>').replace(/\*\*(.+?)\*\*/g,'<b>$1</b>').replace(/\*(.+?)\*/g,'<i>$1</i>').replace(/aethra\.gg\/invite\/(\w+)/g,'<a class="invl" onclick="joinCode(\'$1\')">▶ '+t('joinsrv')+'</a>').replace(/(https?:\/\/[^\s<]+)/g,'<a href="$1" target="_blank" rel="noopener">$1</a>').replace(/@([^\s<@]+)/g,(m,n)=>Object.values(DB.users).some(u=>u.name===n)?`<span class="mn">@${n}</span>`:m)}
+
+/* ---------- auth ---------- */
+async function hp(p){try{const b=await crypto.subtle.digest('SHA-256',new TextEncoder().encode('ae:'+p));return[...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,'0')).join('')}catch(e){let h=5381;for(const c of 'ae:'+p)h=(h*33^c.charCodeAt(0))>>>0;return'x'+h}}
+function aTab(r){AREG=r;authText()}
+function setL(l){L=l;localStorage.setItem('ae_lang',l);authText()}
+function authText(){$('#tag').textContent=t('tagline');$('#tl').textContent=t('login');$('#tr').textContent=t('register');$('#tl').className=AREG?'':'on';$('#tr').className=AREG?'on':'';$('#an').placeholder=t('username');$('#ap').placeholder=t('password');$('#ab').textContent=t(AREG?'register':'login');$('#ae').textContent=''}
+async function doAuth(reg){const n=$('#an').value.trim(),p=$('#ap').value;load();const err=m=>{$('#ae').textContent=t(m)};
+ if(reg){if(n.length<3||p.length<4)return err('e_short');if(Object.values(DB.users).some(u=>u.name.toLowerCase()===n.toLowerCase()))return err('e_exists');
+  const id=nid(),a=COL[Math.floor(Math.random()*7)],b=COL[Math.floor(Math.random()*7)],first=!Object.keys(DB.users).length,cnt=Object.keys(DB.users).length;
+  DB.users[id]={id,name:n,hash:await hp(p),color:a,banner:a,banner2:b,bio:'',pron:'',status:'online',custom:'',ts:Date.now(),fr:[],inc:[],out:[],bl:[],ig:[],notes:{},read:{},lang:L,theme:'dark',accent:'#7c5cff',dev:false,test:false,rl:false,founder:first,early:cnt<10};save();UID=id}
+ else{const u=Object.values(DB.users).find(u=>u.name.toLowerCase()===n.toLowerCase());if(!u||u.hash!==await hp(p))return err('e_cred');UID=u.id}
+ try{sessionStorage.setItem('ae_uid',UID)}catch(e){}start()}
+function start(){L=ME().lang||L;$('#auth').style.display='none';Object.assign(UI,{v:'home',dm:null,tab:'online',ref:null,fresh:1,q:'',tq:''});beat();render();gw();ev('recv','READY',{user:UID})}
+function logout(){if(V.room)leaveRoom();try{sessionStorage.removeItem('ae_uid')}catch(e){}UID=null;clearInterval(timer);closeM();$('#an').value=$('#ap').value='';$('#auth').style.display='flex';authText()}
+
+/* ---------- menus / popups ---------- */
+function cm(){const e=$('#cmx');if(e)e.remove()}
+document.addEventListener('click',cm);document.addEventListener('contextmenu',cm);
+document.addEventListener('keydown',e=>{if(e.key==='Escape'){cm();closeM();if(UI.edit){UI.edit=null;render()}}});
+function menu(x,y,items,cls){cm();const d=document.createElement('div');d.id='cmx';d.className='cm '+(cls||'');build(d,items);document.body.appendChild(d);
+ if(x+470>innerWidth)d.classList.add('fl');d.style.left=Math.max(4,Math.min(x,innerWidth-d.offsetWidth-6))+'px';d.style.top=Math.max(4,Math.min(y,innerHeight-d.offsetHeight-8))+'px'}
+function build(box,items){items.filter(Boolean).forEach(it=>{if(it==='-'){box.insertAdjacentHTML('beforeend','<hr>');return}
+ const d=document.createElement('div');d.className='mi'+(it.red?' red':'')+(it.off?' off':'');d.innerHTML=`<span>${it.l}</span>`+(it.sub?'<b>›</b>':'');
+ if(it.sub){const s=document.createElement('div');s.className='cm sub';build(s,it.sub);d.appendChild(s);d.onclick=e=>e.stopPropagation()}else if(!it.off)d.onclick=()=>{cm();it.fn()};box.appendChild(d)})}
+function emoPop(e,cb){e.stopPropagation();cm();const d=document.createElement('div');d.id='cmx';d.className='cm';d.innerHTML='<div class="emo">'+EM.map(x=>`<span>${x}</span>`).join('')+'</div>';
+ d.querySelectorAll('span').forEach(s=>s.onclick=()=>{cm();cb(s.textContent)});document.body.appendChild(d);
+ d.style.left=Math.max(4,Math.min(e.clientX-100,innerWidth-250))+'px';d.style.top=Math.max(4,Math.min(e.clientY-d.offsetHeight-10,innerHeight-d.offsetHeight-8))+'px'}
+const emoIn=e=>emoPop(e,x=>{$('#inp').value+=x;$('#inp').focus()}),emojiFor=(e,ref,id)=>emoPop(e,x=>react(ref,id,x));
+function open(h,cls){const e=$('#modal');e.innerHTML=`<div class="mdl ${cls||''}"><span class="x" onclick="closeM()">✕</span>${h}</div>`;e.style.display='flex'}
+function closeM(){$('#modal').style.display='none'}
+$('#modal').addEventListener('mousedown',e=>{if(e.target.id==='modal')closeM()});
+const shell=(tabs,cur,fn,body,extra)=>`<div class="sh"><div class="nv">${tabs.map(([k,l])=>`<div class="nvi ${k===cur?'on':''}" onclick="${fn}('${k}')">${l}</div>`).join('')}${extra||''}</div><div class="bd2">${body}</div></div>`;
+const sw=(chk,fn)=>`<label class="sw"><input type="checkbox" ${chk?'checked':''} onchange="${fn}"><span></span></label>`;
+
+/* ---------- render ---------- */
+function render(){if(!UID)return;if(!ME()){logout();return}PR=getPres();
+ if(UI.v!=='home'&&!(G()&&G().mem[UID]))UI.v='home';
+ document.body.dataset.theme=ME().theme||'dark';document.documentElement.style.setProperty('--ac',ME().accent||'#7c5cff');document.documentElement.lang=L;
+ railR();sideR();mainR();memR();dockR();const n=totalUnread();document.title=(n?`(${n}) `:'')+'Aethra'}
+function railR(){const un=totalUnread();
+ $('#rail').innerHTML=`<div class="sv hm ${UI.v==='home'?'on':''}" onclick="goHome()" title="${t('home')}"><div class="orb"></div>${un?`<b class="nb">${un}</b>`:''}</div><div class="sep"></div>`+Object.values(DB.srv).filter(s=>s.mem[UID]).map(s=>`<div class="sv ${UI.v===s.id?'on':''}" style="--g:${s.color}" onclick="goSrv('${s.id}')" title="${esc(s.name)}">${esc(s.name.slice(0,2))}</div>`).join('')+`<div class="sv add" onclick="addSrv()" title="${t('addsrv')}">＋</div>`}
+function sideR(){if(!UID||!ME())return;
+ if(UI.v==='home'){$('#sn').innerHTML=`<input id="fq" class="fq" placeholder="${t('find')}" value="${esc(UI.q)}" oninput="UI.q=this.value;$('#chs').innerHTML=homeList()" onkeydown="if(event.key==='Enter')findDM()" onclick="event.stopPropagation()">`;$('#sn').onclick=null;$('#chs').innerHTML=homeList()}
+ else{const g=G(),m=UID;$('#sn').innerHTML=`<span>${esc(g.name)}</span><span>⌄</span>`;$('#sn').onclick=srvMenu;
+  const row=c=>`<div class="ch ${c.id===UI.ch&&c.type!=='voice'?'on':''}" onclick="pickCh('${c.id}')">${c.priv&&c.type==='text'?'🔒':ICON[c.type]} ${esc(c.name)}${can(m,P.CH)?`<span class="gear" onclick="event.stopPropagation();srvSet('ch')">⚙️</span>`:''}</div>`+(c.type==='voice'?((g.voice||{})[c.id]||[]).map(u=>U(u)?`<div class="vu">🎙 ${esc(nm(U(u)))}</div>`:'').join(''):'');
+  $('#chs').innerHTML=g.ch.filter(c=>!g.cats.find(k=>k.id===c.cat)&&canView(m,c)).map(row).join('')+g.cats.map(k=>`<div class="cat" onclick="fold('${k.id}')"><span>${k.fold?'▸':'▾'} ${esc(k.name)}</span>${can(m,P.CH)?`<span onclick="event.stopPropagation();mkChannel('${k.id}')">＋</span>`:''}</div>`+(k.fold?'':g.ch.filter(c=>c.cat===k.id&&canView(m,c)).map(row).join(''))).join('')}}
+function homeList(){const q=UI.q.toLowerCase(),m=ME();
+ return `<div class="nvb ${!UI.dm?'on':''}" onclick="goFriends()">👥 ${t('friends')}${m.inc.length?`<b class="nb">${m.inc.length}</b>`:''}</div><div class="cat" style="cursor:default"><span>${t('dms')}</span></div>`+(dmKeys().filter(k=>U(partner(k)).name.toLowerCase().includes(q)).map(k=>{const p=U(partner(k)),n=unread(k);return `<div class="ch dmr ${UI.dm===p.id?'on':''}" onclick="openDM('${p.id}')" oncontextmenu="mctx(event,'${p.id}')">${av(p,34)}<div class="dn"><span>${esc(p.name)}</span><small>${esc(p.custom||sttext(p))}</small></div>${n?`<b class="nb">${n}</b>`:''}</div>`}).join('')||`<p class="mu pad">${t('nodms')}</p>`)}
+function dockR(){const m=ME();$('#dock').innerHTML=`<div class="me" onclick="usrSet('acct')">${av(m,36)}<div class="dn"><b>${esc(m.name)}</b><small>${esc(m.custom||sttext(m))}</small></div></div><span class="ib ${UI.mic?'':'off'}" onclick="UI.mic=!UI.mic;dockR()">${UI.mic?'🎤':'🔇'}</span><span class="ib ${UI.deaf?'':'off'}" onclick="UI.deaf=!UI.deaf;dockR()">🎧</span><span class="ib" onclick="usrSet('acct')">⚙️</span>`;
+ $('#vb').innerHTML=UI.vc?`<div style="padding:8px 12px;font-size:13px;color:var(--gr);background:var(--b0)">● ${t('voiceon')} <span class="ib" onclick="leaveVoice()">✕</span></div>`:''}
+function memR(){const el=$('#mem');
+ if(UI.v!=='home'&&UI.mp){const g=G();el.style.display='';el.innerHTML=g.roles.map(r=>{const l=Object.keys(g.mem).map(U).filter(u=>u&&topRole(u.id)===r).sort((a,b)=>isOn(b)-isOn(a));return l.length?`<div class="cat" style="cursor:default"><span>${esc(r.name)} — ${l.length}</span></div>`+l.map(u=>`<div class="mm ${isOn(u)?'':'off'}" onclick="profile('${u.id}')" oncontextmenu="mctx(event,'${u.id}')">${av(u,34)}<span style="color:${r.color}">${esc(nm(u))}</span><span>${r.badge}</span></div>`).join(''):''}).join('')}
+ else if(UI.v==='home'&&UI.dm&&UI.mp&&U(UI.dm)){el.style.display='';el.style.padding='0';el.innerHTML=pcard(U(UI.dm),1);return}
+ else el.style.display='none';el.style.padding='8px'}
+function mainR(){const home=UI.v==='home';$('#msgs').style.padding='';
+ if(home&&!UI.dm){UI.ref=null;$('#cmp').style.display='none';$('#typ').style.display='none';
+  $('#hd').innerHTML=`<span>👥 ${t('friends')}</span>`+['online','all','pend','add'].map(k=>`<span class="tb2 ${UI.tab===k?'on':''}" onclick="UI.tab='${k}';mainR()">${k==='pend'?t('pending')+(ME().inc.length?` (${ME().inc.length})`:''):k==='add'?'＋ '+t('addfriend'):t(k)}</span>`).join('');
+  $('#msgs').innerHTML=friendsBody();return}
+ $('#typ').style.display='';
+ if(home){const p=U(UI.dm);if(!p){UI.dm=null;return mainR()}UI.ref='d:'+dmKey(UID,UI.dm);const bl=ME().bl.includes(p.id)||p.bl.includes(UID);
+  $('#hd').innerHTML=`${av(p,28)}<span>${esc(p.name)}</span><small>${sttext(p)}</small><span class="sp"></span><span class="ib" onclick="startCall(UI.dm)">📞</span><input class="sq" id="sq" placeholder="${t('search')}" value="${esc(UI.tq)}" oninput="UI.tq=this.value;paintMsgs(UI.ref)"><span class="ib" onclick="UI.mp=!UI.mp;memR()">👤</span>`;
+  $('#cmp').style.display='';$('#inp').disabled=bl;$('#inp').placeholder=bl?t('blocked_n'):t('msgd')+p.name;
+  const k=UI.ref.slice(2);if(unread(k)){ME().read[k]=Date.now();save();railR();sideR()}paintMsgs(UI.ref);paintTyp();return}
+ const c=chan();if(!c){$('#msgs').innerHTML=`<div class="empty"><div>🌌</div></div>`;return}UI.ch=c.id;
+ $('#hd').innerHTML=`<span>${ICON[c.type]} ${esc(c.name)}</span><span class="sp"></span><input class="sq" id="sq" placeholder="${t('search')}" value="${esc(UI.tq)}" oninput="UI.tq=this.value;paintMsgs(UI.ref)"><span class="ib" onclick="UI.mp=!UI.mp;memR()">👥</span>`;
+ $('#inp').disabled=false;
+ if(c.type==='forum'){UI.ref=null;$('#cmp').style.display='none';$('#typ').textContent='';forum()}else{UI.ref='c:'+c.id;$('#cmp').style.display='';$('#inp').placeholder=t('msg')+c.name;paintMsgs(UI.ref);paintTyp()}}
+function goHome(){UI.v='home';UI.dm=null;UI.fresh=1;UI.tq='';render()}
+function goFriends(){UI.dm=null;UI.tq='';render()}
+function goSrv(id){UI.v=id;UI.ch=null;UI.post=null;UI.fresh=1;UI.tq='';render()}
+function pickCh(id){const c=G().ch.find(x=>x.id===id);if(c.type==='voice')joinVoice(id);else{UI.ch=id;UI.post=null;UI.fresh=1;UI.tq='';render()}}
+function openDM(uid){closeM();UI.v='home';UI.dm=uid;UI.fresh=1;UI.tq='';UI.q='';render();setTimeout(()=>$('#inp').focus(),50)}
+function findDM(){const q=UI.q.trim().toLowerCase(),u=Object.values(DB.users).find(x=>x.id!==UID&&x.name.toLowerCase()===q);if(u)openDM(u.id);else toast(t('nouser'),1)}
+function fold(id){mut(()=>{const k=G().cats.find(x=>x.id===id);k.fold=!k.fold})}
+
+/* ---------- messages ---------- */
+function getList(ref){const id=ref.slice(2);return ref[0]==='d'?(DB.dm[id]=DB.dm[id]||[]):(G().msgs[id]=G().msgs[id]||[])}
+function msgHtml(x,ref,prev,dc){
+ const u=U(x.u)||{id:x.u,name:'?',color:'#777',banner2:'#555',status:'invisible'},g=UI.v!=='home'&&G(),mr=g&&g.mem[x.u],mine=x.u===UID;
+ const rc=mr?topRole(x.u).color:'inherit',n=nm(u),day=d=>new Date(d).toDateString(),hm=d=>new Date(d).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
+ const ds=!prev||day(prev.ts)!==day(x.ts),grp=prev&&!ds&&prev.u===x.u&&x.ts-prev.ts<3e5;
+ const canDel=!x.mock&&(mine||(g&&ref&&ref[0]==='c'&&can(UID,P.MSG)));
+ const tb=x.mock?'':`<div class="tb">${ref?`<span onclick="emojiFor(event,'${ref}','${x.id}')">😊</span>`:''}${ref&&mine?`<span onclick="UI.edit='${x.id}';render()">✏️</span>`:''}${canDel?`<span onclick="${dc||`delMsg('${ref}','${x.id}')`}">🗑</span>`:''}</div>`;
+ const body=UI.edit===x.id?`<input class="ei" id="ei" value="${esc(x.t)}" onkeydown="editKey(event,'${ref}','${x.id}')"><small>Esc / Enter</small>`:`<div class="tx">${fmt(x.t)}${x.ed?` <small>(${t('edited')})</small>`:''}</div>`;
+ const rx=Object.entries(x.re||{}).filter(e=>e[1].length).map(([e,us])=>`<span class="rx ${us.includes(UID)?'me':''}" onclick="react('${ref}','${x.id}','${e}')">${e} ${us.length}</span>`).join('');
+ return (ds?`<div class="ds"><span>${new Date(x.ts).toLocaleDateString(L,{day:'numeric',month:'long',year:'numeric'})}</span></div>`:'')+`<div class="m ${grp?'grp':''}" oncontextmenu="mctx(event,'${u.id}')">${grp?`<span class="gt">${hm(x.ts)}</span>`:av(u,40)}<div class="mb">${grp?'':`<div class="mh"><b style="color:${rc}" onclick="profile('${u.id}')">${esc(n)}</b>${x.mock?'<span class="tag">TEST</span>':''}<span class="mt">${hm(x.ts)}</span></div>`}${body}${rx?`<div class="rxs">${rx}</div>`:''}</div>${tb}</div>`}
+function paintMsgs(ref){if(!ref)return;const el=$('#msgs'),near=UI.fresh||el.scrollHeight-el.scrollTop-el.clientHeight<140;
+ let l=getList(ref).concat(UI.mock[ref]||[]).filter(x=>!hidden(x));if(UI.tq)l=l.filter(x=>x.t.toLowerCase().includes(UI.tq.toLowerCase()));
+ let intro='';if(ref[0]==='d'){const p=U(UI.dm);intro=`<div style="padding:30px 0 10px">${av(p,72)}<h2 style="margin:10px 0 2px">${esc(p.name)}</h2><span class="mu">${t('dmstart')} <b>${esc(p.name)}</b></span></div>`}
+ else if(!l.length)intro=`<div class="empty"><div>✨</div><p>${t('emptych')}</p></div>`;
+ el.innerHTML=intro+l.map((x,i)=>msgHtml(x,ref,l[i-1])).join('');if(near)el.scrollTop=1e9;UI.fresh=0;if(UI.edit)setTimeout(()=>{const e=$('#ei');e&&e.focus()},0)}
+function paintTyp(){if(!UID||!UI.ref){const e=$('#typ');if(e)e.textContent='';return}const now=Date.now(),n=Object.keys(UI.typ).filter(k=>k.startsWith(UI.ref+':')&&now-UI.typ[k]<5000&&k.split(':').pop()!==UID).map(k=>U(k.split(':').pop())).filter(Boolean).map(u=>nm(u));$('#typ').textContent=n.length?n.join(', ')+' '+t('typing'):''}
+function submit(){const v=$('#inp').value.trim(),ref=UI.ref;if(!v||!ref)return;
+ if(ref[0]==='d'){const p=U(partner(ref.slice(2)));if(ME().bl.includes(p.id)||p.bl.includes(UID))return toast(t('blocked_n'),1)}
+ else{if(!can(UID,P.SEND))return toast(t('send403'),1);if(MR(UID).to>Date.now())return toast(t('timeout'),1);const c=chan(),w=(c.slow||0)*1000-(Date.now()-(LAST[ref]||0));if(w>0&&!can(UID,P.MSG))return toast(t('slow')+' '+Math.ceil(w/1000),1);LAST[ref]=Date.now()}
+ if(ME().rl&&Math.random()<.4){ev('http','429',{retry_after:2});return toast(t('rl'),1)}
+ $('#inp').value='';UI.fresh=1;mut(()=>getList(ref).push({id:nid(),u:UID,t:v,ts:Date.now()}));ev('send','MESSAGE_CREATE',{ref})}
+$('#inp').addEventListener('keydown',e=>{if(e.key==='Enter')submit();else if(bc&&UI.ref&&Date.now()-lastTyp>2000){lastTyp=Date.now();bc.postMessage({t:'typ',r:UI.ref,u:UID});ev('send','TYPING_START',{ref:UI.ref})}});
+function react(ref,id,e){mut(()=>{const m=getList(ref).find(x=>x.id===id);if(!m)return;m.re=m.re||{};const a=m.re[e]=m.re[e]||[],i=a.indexOf(UID);i<0?a.push(UID):a.splice(i,1)})}
+function delMsg(ref,id){mut(()=>{const l=getList(ref),i=l.findIndex(x=>x.id===id);if(i<0)return;if(l[i].u!==UID&&ref[0]==='c')audit('MESSAGE_DELETE',U(l[i].u)?.name);l.splice(i,1)});ev('recv','MESSAGE_DELETE',{id})}
+function editKey(e,ref,id){if(e.key==='Enter'){const v=e.target.value.trim();UI.edit=null;if(!v)return render();mut(()=>{const m=getList(ref).find(x=>x.id===id);if(m){m.t=v;m.ed=1}})}else if(e.key==='Escape'){UI.edit=null;render()}}
+
+/* ---------- friends ---------- */
+function friendsBody(){const m=ME();let h;
+ if(UI.tab==='add')h=`<h3>${t('addfriend')}</h3><p class="mu">${t('addhint')}</p><div class="row"><input id="afn" placeholder="${t('username')}" onkeydown="if(event.key==='Enter')addFr()"><button onclick="addFr()" style="white-space:nowrap">${t('sendreq')}</button></div>`;
+ else if(UI.tab==='pend')h=(m.inc.length?`<h5>${t('incoming')}</h5>`+m.inc.map(id=>frRow(id,'in')).join(''):'')+(m.out.length?`<h5>${t('outgoing')}</h5>`+m.out.map(id=>frRow(id,'out')).join(''):'')||empty('⏳',t('nopend'));
+ else{const l=m.fr.map(U).filter(Boolean).filter(u=>UI.tab==='all'||isOn(u));h=l.length?`<h5>${t(UI.tab)} — ${l.length}</h5>`+l.map(u=>frRow(u.id,'fr')).join(''):empty('👥',t(UI.tab==='all'?'nofr':'noonl'))}
+ return h}
+const empty=(i,s)=>`<div class="empty"><div>${i}</div><p>${s}</p></div>`;
+function frRow(id,k){const u=U(id);if(!u)return'';const b=(i,f)=>`<span onclick="event.stopPropagation();${f}">${i}</span>`;
+ return `<div class="fr" oncontextmenu="mctx(event,'${id}')" onclick="profile('${id}')">${av(u,42)}<div class="dn"><b>${esc(u.name)}</b><small>${esc(u.custom||sttext(u))}</small></div><div class="acts">${k==='fr'?b('💬',`openDM('${id}')`):k==='in'?b('✔',`accFr('${id}')`)+b('✖',`rmReq('${id}')`):b('✖',`rmReq('${id}')`)}</div></div>`}
+function addFr(){const n=$('#afn').value.trim().toLowerCase();load();const u=Object.values(DB.users).find(x=>x.name.toLowerCase()===n);if(!u||u.id===UID)return toast(t('nouser'),1);if(ME().fr.includes(u.id))return toast(t('already'));if(ME().bl.includes(u.id)||u.bl.includes(UID))return toast(t('blocked_n'),1);
+ if(ME().inc.includes(u.id))return accFr(u.id);mut(()=>{const a=ME(),b=U(u.id);if(!b.inc.includes(UID))b.inc.push(UID);if(!a.out.includes(u.id))a.out.push(u.id)});toast(t('reqsent'));ev('send','RELATIONSHIP_ADD',{to:u.id})}
+function accFr(id){mut(()=>{const a=ME(),b=U(id);a.inc=a.inc.filter(x=>x!==id);b.out=b.out.filter(x=>x!==UID);if(!a.fr.includes(id))a.fr.push(id);if(!b.fr.includes(UID))b.fr.push(UID)})}
+function rmReq(id){mut(()=>{const a=ME(),b=U(id);a.inc=a.inc.filter(x=>x!==id);a.out=a.out.filter(x=>x!==id);b.inc=b.inc.filter(x=>x!==UID);b.out=b.out.filter(x=>x!==UID)})}
+function relSet(id,f){mut(()=>{const a=ME(),b=U(id);if(f==='fr'){if(a.fr.includes(id)){a.fr=a.fr.filter(x=>x!==id);b.fr=b.fr.filter(x=>x!==UID)}else{a.out.push(id);b.inc.push(UID)}}
+ else{a[f]=a[f].includes(id)?a[f].filter(x=>x!==id):[...a[f],id];if(f==='bl'&&a.bl.includes(id)){a.fr=a.fr.filter(x=>x!==id);b.fr=b.fr.filter(x=>x!==UID)}}});toast(t('done'))}
+function setNote(id,v){load();ME().notes[id]=v;save()}
+
+/* ---------- profile / context menu ---------- */
+function pcard(u,full){const g=UI.v!=='home'&&G(),mr=g&&g.mem[u.id],rs=mr?g.roles.filter(r=>mr.roles.includes(r.id)):[],mu=Object.values(DB.srv).filter(s=>s.mem[u.id]&&s.mem[UID]);
+ return `<div class="pc"><div class="pbn" style="background:linear-gradient(135deg,${u.banner},${u.banner2||u.banner})"></div><div class="pav">${av(u,84)}</div><div class="pbd"><div class="pnm">${esc(u.name)} <span class="pron">${esc(u.pron||'')}</span></div><div class="bdgs">${u.founder!==undefined?badgeHtml(u):''}</div>${u.custom?`<div class="cst">${esc(u.custom)}</div>`:''}<hr><h5>${t('about')}</h5><p>${esc(u.bio||'—')}</p><h5>${t('since')}</h5><p>${new Date(u.ts).toLocaleDateString(L)}</p>`+(rs.length?`<h5>${t('roles')}</h5><div class="chips">${rs.map(r=>`<span class="chip" style="--c:${r.color}">${r.badge||'●'} ${esc(r.name)}</span>`).join('')}</div>`:'')+(mu.length&&u.id!==UID?`<h5>${t('mutual')} — ${mu.length}</h5><div class="chips">${mu.map(s=>`<span class="chip">${esc(s.name)}</span>`).join('')}</div>`:'')+(full&&u.id!==UID?`<h5>${t('note')}</h5><textarea class="nt" rows="2" placeholder="${t('notehint')}" onchange="setNote('${u.id}',this.value)">${esc(ME().notes[u.id]||'')}</textarea>`:'')+`</div></div>`}
+function profile(uid){const u=U(uid);if(!u||uid==='mock')return;const m=ME(),self=uid===UID;
+ open(pcard(u,1)+(self?'':`<div class="row" style="padding:0 18px 18px"><button onclick="openDM('${uid}')">💬 ${t('dm')}</button><button class="g" onclick="relSet('${uid}','fr');closeM()">${m.fr.includes(uid)?t('rmfr'):m.out.includes(uid)?'⏳ '+t('reqpending'):t('addfr')}</button></div>`),'prof')}
+function mctx(e,uid){e.preventDefault();e.stopPropagation();const u=U(uid);if(!u||uid==='mock')return;const m=ME(),self=uid===UID,g=UI.v!=='home'&&G(),inSrv=g&&g.mem[uid],tg=inSrv&&above(UID,uid);
+ const fr=m.fr.includes(uid),ig=m.ig.includes(uid),bl=m.bl.includes(uid);
+ const inv=Object.values(DB.srv).filter(s=>s.mem[UID]&&!s.mem[uid]).map(s=>({l:esc(s.name),fn:()=>sendInvite(uid,s.id)}));
+ menu(e.clientX,e.clientY,[{l:t('profile'),fn:()=>profile(uid)},inSrv&&UI.ref&&UI.ref[0]==='c'&&{l:t('mention'),fn:()=>{$('#inp').value+='@'+u.name+' ';$('#inp').focus()}},
+ !self&&{l:t('dm'),fn:()=>openDM(uid)},!self&&{l:t('call'),fn:()=>startCall(uid)},
+ {l:`${t('note')}<small>${t('notehint')}</small>`,fn:()=>{const n=prompt(t('note'),m.notes[uid]||'');if(n!==null)setNote(uid,n)}},
+ '-',{l:t('apps'),sub:[{l:t('noapps'),off:1}]},!self&&{l:t('invite'),sub:inv.length?inv:[{l:t('none'),off:1}]},
+ !self&&(m.out.includes(uid)?{l:'⏳ '+t('reqpending'),off:1}:{l:t(fr?'rmfr':m.inc.includes(uid)?'acceptfr':'addfr'),fn:()=>relSet(uid,'fr')}),!self&&{l:t(ig?'unignore':'ignore'),fn:()=>relSet(uid,'ig')},!self&&{l:t(bl?'unblock':'block'),red:1,fn:()=>relSet(uid,'bl')},
+ (tg&&(can(UID,P.KICK)||can(UID,P.BAN)||can(UID,P.TO)))&&'-',
+ tg&&can(UID,P.TO)&&{l:t(g.mem[uid].to>Date.now()?'untimeout':'to'),fn:()=>mut(()=>{const r=MR(uid);r.to=r.to>Date.now()?0:Date.now()+60000;audit('MEMBER_TIMEOUT',U(uid).name)})},
+ tg&&can(UID,P.KICK)&&{l:t('kick'),red:1,fn:()=>mut(()=>{delete G().mem[uid];audit('MEMBER_KICK',U(uid).name)})},
+ tg&&can(UID,P.BAN)&&{l:t('ban'),red:1,fn:()=>mut(()=>{delete G().mem[uid];G().bans.push(uid);audit('MEMBER_BAN',U(uid).name)})},
+ inSrv&&'-',inSrv&&{l:t('roles'),sub:g.roles.map(r=>({l:(g.mem[uid].roles.includes(r.id)?'☑ ':'☐ ')+`<span style="color:${r.color}">${esc(r.name)}</span>`,off:!(isOwner(UID)||(can(UID,P.ROLES)&&rpos(r)<rpos(topRole(UID)))),fn:()=>toggleRole(uid,r.id)}))},
+ m.dev&&'-',m.dev&&{l:'🆔 '+t('copyid'),fn:()=>copy(uid)}])}
+function toggleRole(uid,rid){mut(()=>{const r=MR(uid);if(r.roles.includes(rid)){if(r.roles.length<2)return toast(t('lastrole'),1);r.roles=r.roles.filter(x=>x!==rid)}else r.roles.push(rid);audit('MEMBER_ROLE_UPDATE',U(uid).name)})}
+function sendInvite(uid,sid){load();const g=DB.srv[sid];let c=Object.keys(g.invites).find(k=>g.invites[k].by===UID);if(!c){c=Math.random().toString(36).slice(2,10);g.invites[c]={by:UID,uses:0};DB.inv[c]=sid}
+ const k=dmKey(UID,uid);(DB.dm[k]=DB.dm[k]||[]).push({id:nid(),u:UID,t:t('invmsg')+' '+g.name+': aethra.gg/invite/'+c,ts:Date.now()});save();render();toast(t('invsent'))}
+
+/* ---------- servers ---------- */
+function addSrv(){open(`<h2>${t('addsrv')}</h2><div class="two"><div class="card2"><h4>${t('create')}</h4><input id="sn1" placeholder="${t('srvname')}" onkeydown="if(event.key==='Enter')mkSrv()"><button onclick="mkSrv()">${t('create')}</button></div><div class="card2"><h4>${t('join')}</h4><input id="jc" placeholder="aethra.gg/invite/…" onkeydown="if(event.key==='Enter')joinCode($('#jc').value)"><button onclick="joinCode($('#jc').value)">${t('join')}</button></div></div>`)}
+function mkSrv(){const n=$('#sn1').value.trim();if(!n)return;const sid=nid(),ids=[nid(),nid(),nid(),nid(),nid()];
+ mut(()=>{DB.srv[sid]={id:sid,name:n,desc:'',owner:UID,color:COL[Math.floor(Math.random()*7)],mute:0,
+ roles:[{id:'r3',name:t('r_admin'),color:'#f0b232',perm:1,badge:'👑'},{id:'r2',name:t('r_mod'),color:'#34d399',perm:4|8|16|32|64|128,badge:'🛡️'},{id:'r1',name:t('r_mem'),color:'#b5bac1',perm:64|128,badge:''}],
+ mem:{[UID]:{roles:['r3'],nick:'',to:0,joined:Date.now()}},cats:[{id:'k1',name:t('c_text')},{id:'k2',name:t('c_voice')},{id:'k3',name:t('c_forum')}],
+ ch:[{id:ids[0],name:'general',type:'text',cat:'k1',slow:0},{id:ids[1],name:'random',type:'text',cat:'k1',slow:0},{id:ids[2],name:'mods-only',type:'text',cat:'k1',slow:0,priv:1},{id:ids[3],name:'Lounge',type:'voice',cat:'k2'},{id:ids[4],name:'ideas',type:'forum',cat:'k3',slow:0}],
+ bans:[],audit:[],invites:{},events:[],msgs:{},posts:{},voice:{}}});
+ Object.assign(UI,{v:sid,ch:ids[0],fresh:1});closeM();render();toast(t('welcome')+' '+n)}
+function joinCode(c){c=c.trim().split('/').pop();load();const sid=DB.inv[c],g=DB.srv[sid];closeM();if(!g)return toast(t('e_inv'),1);if(g.bans.includes(UID))return toast(t('e_ban'),1);
+ if(!g.mem[UID])mut(()=>{DB.srv[sid].mem[UID]={roles:[DB.srv[sid].roles.at(-1).id],nick:'',to:0,joined:Date.now()};DB.srv[sid].invites[c].uses++});goSrv(sid)}
+function srvMenu(e){e.stopPropagation();const g=G(),r=e.currentTarget.getBoundingClientRect(),c=k=>can(UID,P[k]);
+ menu(r.left+8,r.bottom,[{l:'👥 '+t('sinvite'),fn:()=>{mkInvite();srvSet('inv')}},(c('CH')||c('ROLES')||c('BAN'))&&{l:'⚙️ '+t('ssettings'),fn:()=>srvSet('ov')},
+ c('CH')&&{l:'➕ '+t('mkch'),fn:()=>mkChannel()},c('CH')&&{l:'📁 '+t('mkcat'),fn:mkCat},c('CH')&&{l:'📅 '+t('mkevent'),fn:mkEvent},{l:'💬 '+t('threads'),fn:threads},'-',
+ {l:(g.mute?'🔕 ':'🔔 ')+t('notif'),fn:()=>mut(()=>{G().mute=!G().mute})},{l:(g.hideDm?'☑ ':'☐ ')+t('privs'),fn:()=>mut(()=>{G().hideDm=!G().hideDm})},'-',
+ {l:'✏️ '+t('editprof'),fn:svProf},
+ ME().dev&&{l:'🆔 '+t('copysid'),fn:()=>copy(g.id)},'-',
+ !isOwner(UID)&&{l:t('leave'),red:1,fn:()=>{const id=g.id;mut(()=>{delete DB.srv[id].mem[UID]})}},
+ isOwner(UID)&&{l:t('delsrv'),red:1,fn:()=>{if(confirm(t('delsrv')+'?')){const id=g.id;mut(()=>{delete DB.srv[id]})}}}])}
+function joinVoice(cid){mut(()=>{const g=G();g.voice=g.voice||{};Object.keys(g.voice).forEach(k=>g.voice[k]=g.voice[k].filter(x=>x!==UID));(g.voice[cid]=g.voice[cid]||[]).push(UID)});UI.vc={s:UI.v,c:cid};dockR();ev('send','VOICE_STATE_UPDATE',{channel_id:cid})}
+function leaveVoice(){const v=UI.vc;UI.vc=null;mut(()=>{const g=DB.srv[v.s];if(g)Object.keys(g.voice||{}).forEach(k=>g.voice[k]=g.voice[k].filter(x=>x!==UID))})}
+
+/* ---------- forums ---------- */
+function forum(){const g=G(),c=chan(),l=g.posts[c.id]=g.posts[c.id]||[],box=$('#msgs');
+ if(UI.post){const p=l.find(x=>x.id===UI.post);if(!p){UI.post=null;return forum()}
+  box.innerHTML=`<div class="row"><button class="g" onclick="UI.post=null;forum()">← ${t('back')}</button>${(p.u===UID||can(UID,P.MSG))?`<button class="r" onclick="delPost('${p.id}')">${t('del')}</button>`:''}</div><h2>${esc(p.title)}</h2>`+msgHtml({u:p.u,t:p.body,ts:p.ts,id:p.id},null,null,'')+p.replies.filter(x=>!hidden(x)).map((x,i,a)=>msgHtml(x,null,a[i-1]||{u:'',ts:0},`delRe('${p.id}','${x.id}')`)).join('')+`<div class="row"><input id="rp" placeholder="${t('reply')}" onkeydown="if(event.key==='Enter')reply('${p.id}')"><button onclick="reply('${p.id}')">${t('send')}</button></div>`}
+ else box.innerHTML=`<div class="row"><h2 style="flex:1;margin:0">${esc(c.name)}</h2><button onclick="newPost()">＋ ${t('newpost')}</button></div>`+(l.length?l.filter(p=>!hidden(p)).map(p=>`<div class="card" onclick="UI.post='${p.id}';forum()"><b>${esc(p.title)}</b><div class="mu">${esc(p.body.slice(0,120))}</div><small>${esc(U(p.u)?nm(U(p.u)):'?')} · 💬 ${p.replies.length} · ${new Date(p.ts).toLocaleDateString(L)}</small></div>`).join(''):empty('💬',t('nopost')))}
+function newPost(){if(!need(P.SEND))return;open(`<h2>${t('newpost')}</h2><div class="row"><input id="pt" placeholder="${t('ptitle')}"></div><div class="row"><textarea id="pb" rows="5" placeholder="${t('pbody')}"></textarea></div><button onclick="mkPost()">${t('create')}</button>`)}
+function mkPost(){const ti=$('#pt').value.trim(),b=$('#pb').value,cid=chan().id;if(!ti)return;mut(()=>{const l=G().posts[cid]=G().posts[cid]||[];l.unshift({id:nid(),u:UID,title:ti,body:b,ts:Date.now(),replies:[]})});closeM();ev('send','THREAD_CREATE',{title:ti})}
+function reply(pid){if(!need(P.SEND))return;const v=$('#rp').value.trim(),cid=chan().id;if(!v)return;mut(()=>G().posts[cid].find(p=>p.id===pid).replies.push({id:nid(),u:UID,t:v,ts:Date.now()}))}
+function delPost(pid){const cid=chan().id;mut(()=>{G().posts[cid]=G().posts[cid].filter(p=>p.id!==pid);audit('THREAD_DELETE')});UI.post=null;render()}
+function delRe(pid,rid){const cid=chan().id;mut(()=>{const p=G().posts[cid].find(x=>x.id===pid);p.replies=p.replies.filter(x=>x.id!==rid)})}
+function threads(){const g=G(),all=g.ch.filter(c=>c.type==='forum').flatMap(c=>(g.posts[c.id]||[]).map(p=>({c,p})));
+ open(`<h2>💬 ${t('threads')}</h2>`+(all.length?all.map(x=>`<div class="card" onclick="closeM();UI.ch='${x.c.id}';UI.post='${x.p.id}';render()"><b>${esc(x.p.title)}</b> <span class="mu">#${esc(x.c.name)} · 💬 ${x.p.replies.length}</span></div>`).join(''):empty('💬',t('none'))))}
+
+/* ---------- user settings ---------- */
+function usrSet(tab){const m=ME();let b='';
+ if(tab==='acct'){const f=(l,i,v,ty)=>`<div class="row"><label style="width:120px">${t(l)}</label><input id="${i}" type="${ty||'text'}" value="${esc(v)}" oninput="prevUpd()"></div>`;
+  b=`<h2>${t('acct')}</h2><div style="display:grid;grid-template-columns:1fr 280px;gap:16px"><div>`+f('name','f1',m.name)+f('pron','f7',m.pron||'')+f('custom','f3',m.custom)+f('bio','f4',m.bio||'')+f('avatar','f5',m.color,'color')+f('banner','f6',m.banner,'color')+f('banner2','f8',m.banner2||m.banner,'color')+`<div class="row"><label style="width:120px">${t('status')}</label><select id="f2" onchange="prevUpd()">${Object.keys(ST).concat('invisible').map(k=>`<option value="${k}" ${m.status===k?'selected':''}>${t(k==='online'?'online':k)}</option>`).join('')}</select></div><button onclick="saveProf()">${t('saved').replace('Сохранено','Сохранить').replace('Saved','Save')}</button></div><div id="pv" style="border:1px solid var(--bd);border-radius:14px;overflow:hidden;align-self:start">${pcard(m)}</div></div>`}
+ if(tab==='look')b=`<h2>${t('look')}</h2><h5>${t('theme')}</h5>`+['dark','midnight','light'].map(k=>`<div class="th ${m.theme===k?'on':''}" onclick="setPref('theme','${k}','look')">${t('th_'+k)}</div>`).join('')+`<h5>${t('accent')}</h5>`+COL.map(c=>`<span class="dot ${m.accent===c?'on':''}" style="background:${c}" onclick="setPref('accent','${c}','look')"></span>`).join('');
+ if(tab==='lang')b=`<h2>${t('lang')}</h2><div class="row"><select onchange="L=this.value;localStorage.setItem('ae_lang',L);setPref('lang',L,'lang')"><option value="ru" ${L==='ru'?'selected':''}>Русский</option><option value="en" ${L==='en'?'selected':''}>English</option></select></div>`;
+ if(tab==='dev'){b=`<h2>${t('devs')}</h2>`+[['devmode','devdesc','dev'],['test','testdesc','test'],['rlsim','','rl']].map(([a,d,k])=>`<div class="row"><div style="flex:1"><b>${t(a)}</b><div class="mu">${d?t(d):''}</div></div>${sw(m[k],`setPref('${k}',this.checked,'dev')`)}</div>`).join('');
+  if(m.dev){b+=`<h5>${t('events')}</h5><div id="log">${esc(evlog.join('\n'))}</div>`;if(UI.v!=='home'){const g=G();b+=`<h5>${t('inspect')} — ${esc(g.name)}</h5>`+PL.map(k=>`<div class="row"><span style="flex:1">${t('p_'+k)}</span><span>${can(UID,P[k])?'✅':'❌'}</span></div>`).join('')}}}
+ open(shell([['acct','👤 '+t('acct')],['look','🎨 '+t('look')],['lang','🌐 '+t('lang')],['dev','&lt;/&gt; '+t('devs')]],tab,'usrSet',b,`<div class="nvi" style="color:var(--rd);margin-top:20px" onclick="logout()">⎋ ${t('logout')}</div>`),'wide')}
+function profVals(){return{name:$('#f1').value.trim(),pron:$('#f7').value,custom:$('#f3').value,bio:$('#f4').value,color:$('#f5').value,banner:$('#f6').value,banner2:$('#f8').value,status:$('#f2').value}}
+function prevUpd(){$('#pv').innerHTML=pcard({...ME(),...profVals()})}
+function saveProf(){const v=profVals();load();if(!v.name||Object.values(DB.users).some(u=>u.id!==UID&&u.name.toLowerCase()===v.name.toLowerCase()))return toast(t('e_exists'),1);Object.assign(ME(),v);save();render();toast(t('saved'))}
+function setPref(k,v,tab){mut(()=>{ME()[k]=v});if(k==='test')gw();usrSet(tab)}
+
+/* ---------- server settings ---------- */
+function srvSet(tab){S_tab=tab;const g=G();let b='';
+ if(tab==='ov')b=`<h2>${t('ov')}</h2><div class="row"><label style="width:120px">${t('srvname')}</label><input id="gn" value="${esc(g.name)}"></div><div class="row"><label style="width:120px">${t('desc')}</label><input id="gd" value="${esc(g.desc||'')}"></div><button onclick="if(need(P.CH)){const a=$('#gn').value,d=$('#gd').value;mut(()=>{G().name=a||G().name;G().desc=d;audit('GUILD_UPDATE')});srvSet('ov')}">${t('ov')==='Обзор'?'Сохранить':'Save'}</button>`;
+ if(tab==='roles')b=rolesTab();
+ if(tab==='ch')b=`<div class="row"><button onclick="mkCat()">＋ ${t('mkcat')}</button><button onclick="mkChannel()">＋ ${t('mkch')}</button></div>`+g.cats.map(k=>`<div class="row"><b>▾</b><input value="${esc(k.name)}" onchange="catName('${k.id}',this.value)"><button class="r" onclick="delCat('${k.id}')">✕</button></div>`+g.ch.filter(c=>c.cat===k.id).map(chEdit).join('')).join('')+g.ch.filter(c=>!g.cats.find(k=>k.id===c.cat)).map(chEdit).join('');
+ if(tab==='inv')b=`<button onclick="mkInvite();srvSet('inv')">＋ ${t('mkinv')}</button>`+(Object.entries(g.invites).map(([c,i])=>`<div class="row"><code style="flex:1">aethra.gg/invite/${c}</code><small>${esc(U(i.by)?.name||'')} · ${i.uses}</small><button class="g" onclick="copy('aethra.gg/invite/${c}')">⧉</button><button class="r" onclick="revInv('${c}')">${t('revoke')}</button></div>`).join('')||`<p class="mu">${t('none')}</p>`);
+ if(tab==='bans')b=g.bans.map(u=>`<div class="row"><span style="flex:1">${esc(U(u)?.name||u)}</span><button class="g" onclick="unban('${u}')">${t('unban')}</button></div>`).join('')||`<p class="mu">${t('none')}</p>`;
+ if(tab==='audit')b=g.audit.slice(0,30).map(a=>`<div class="mu" style="font-size:13px">${a.ts} · <b>${esc(a.by)}</b> → ${a.a} ${esc(a.tg)}</div>`).join('')||`<p class="mu">${t('none')}</p>`;
+ if(tab==='evs')b=`<button onclick="mkEvent()">＋ ${t('mkevent')}</button>`+(g.events.map(e=>`<div class="row"><span style="flex:1">📅 ${esc(e.name)} <small>${new Date(e.ts).toLocaleDateString(L)}</small></span><button class="r" onclick="mut(()=>{G().events=G().events.filter(x=>x.id!=='${e.id}')});srvSet('evs')">✕</button></div>`).join('')||`<p class="mu">${t('none')}</p>`);
+ open(shell([['ov','⚙️ '+t('ov')],['roles','🏷 '+t('rls')],['ch','# '+t('chs')],['inv','👥 '+t('invs')],['evs','📅 '+t('evs')],['bans','🔨 '+t('bans')],['audit','📜 '+t('audit')]],tab,'srvSet',`<h3 style="margin:0 0 10px">${esc(g.name)}</h3>`+b),'wide')}
+let S_tab='ov',S_rsel=null;
+function chEdit(c){return `<div class="row" style="margin-left:18px"><span>${ICON[c.type]}</span><input value="${esc(c.name)}" onchange="upCh('${c.id}','name',this.value)"><input type="number" min="0" style="width:74px" title="${t('slowm')}" value="${c.slow||0}" onchange="upCh('${c.id}','slow',+this.value)"><label title="${t('priv')}">🔒<input type="checkbox" ${c.priv?'checked':''} onchange="upCh('${c.id}','priv',this.checked?1:0)"></label><button class="r" onclick="delCh('${c.id}')">✕</button></div>`}
+function upCh(id,f,v){if(!need(P.CH))return;mut(()=>{G().ch.find(c=>c.id===id)[f]=v;audit('CHANNEL_UPDATE')})}
+function catName(id,v){if(!need(P.CH))return;mut(()=>{G().cats.find(x=>x.id===id).name=v})}
+function delCh(id){if(!need(P.CH))return;mut(()=>{const g=G();g.ch=g.ch.filter(c=>c.id!==id);audit('CHANNEL_DELETE')});srvSet('ch')}
+function delCat(id){if(!need(P.CH))return;mut(()=>{const g=G();g.ch.forEach(c=>{if(c.cat===id)c.cat=null});g.cats=g.cats.filter(k=>k.id!==id)});srvSet('ch')}
+function mkCat(){if(!need(P.CH))return;const n=prompt(t('catname'));if(!n)return;mut(()=>{G().cats.push({id:nid(),name:n});audit('CATEGORY_CREATE',n)})}
+function mkChannel(cat){if(!need(P.CH))return;const g=G();open(`<h2>${t('mkch')}</h2><div class="row"><select id="nt">${['text','voice','forum'].map(k=>`<option value="${k}">${ICON[k]} ${t('t_'+k)}</option>`).join('')}</select></div><div class="row"><input id="nc" placeholder="${t('chname')}"></div><div class="row"><select id="nk"><option value="">${t('nocat')}</option>${g.cats.map(k=>`<option value="${k.id}" ${k.id===cat?'selected':''}>${esc(k.name)}</option>`).join('')}</select></div><div class="row"><label style="display:flex;gap:8px;align-items:center"><input type="checkbox" id="np"> ${t('priv')}</label></div><button onclick="addCh()">${t('create')}</button>`)}
+function addCh(){const n=$('#nc').value.trim().replace(/\s+/g,'-');if(!n)return;const c={id:nid(),name:n,type:$('#nt').value,cat:$('#nk').value||null,slow:0,priv:$('#np').checked?1:0};mut(()=>{G().ch.push(c);audit('CHANNEL_CREATE',n)});ev('recv','CHANNEL_CREATE',c);closeM()}
+function mkInvite(){const g=G();let c=Math.random().toString(36).slice(2,10);mut(()=>{G().invites[c]={by:UID,uses:0};DB.inv[c]=g.id;audit('INVITE_CREATE',c)});copy('aethra.gg/invite/'+c)}
+function revInv(c){mut(()=>{delete G().invites[c];delete DB.inv[c]});srvSet('inv')}
+function mkEvent(){if(!need(P.CH))return;const n=prompt(t('evname'));if(!n)return;mut(()=>{G().events.push({id:nid(),name:n,ts:Date.now()+864e5});audit('EVENT_CREATE',n)});toast(t('done'))}
+function unban(id){if(!need(P.BAN))return;mut(()=>{G().bans=G().bans.filter(x=>x!==id);audit('MEMBER_UNBAN',U(id)?.name)});srvSet('bans')}
+
+/* ---------- role editor ---------- */
+function rolesTab(){const g=G(),r=g.roles.find(x=>x.id===S_rsel)||g.roles[0];S_rsel=r.id;const ed=canEditRole(r);
+ return `<div class="row"><button onclick="addRole()">＋ ${t('newrole')}</button><small>${t('hierhint')}</small></div><div class="rl2"><div>`+
+ g.roles.map(x=>`<div class="nvi ${x.id===r.id?'on':''}" onclick="S_rsel='${x.id}';srvSet('roles')"><span><span style="color:${x.color}">●</span> ${esc(x.name)} ${x.badge}</span><span class="ar"><a onclick="event.stopPropagation();mvRole('${x.id}',-1)">▲</a><a onclick="event.stopPropagation();mvRole('${x.id}',1)">▼</a></span></div>`).join('')+`</div><div>`+
+ (ed?'':`<p style="color:var(--rd)">${t('noedit')}</p>`)+`<fieldset ${ed?'':'disabled'} style="border:0;padding:0;margin:0">
+ <div class="row"><label style="width:120px">${t('rname')}</label><input value="${esc(r.name)}" onchange="setRole('name',this.value)"></div>
+ <div class="row"><label style="width:120px">${t('rcolor')}</label><input type="color" value="${r.color}" onchange="setRole('color',this.value)"></div>
+ <div class="row"><label style="width:120px">${t('rbadge')}</label><input value="${esc(r.badge)}" maxlength="4" onchange="setRole('badge',this.value)"></div><h4>${t('perms')}</h4>`+
+ PL.map(k=>`<div class="row"><span style="flex:1">${t('p_'+k)}</span>${sw(r.perm&P[k],`setPerm(${P[k]},this.checked)`)}</div>`).join('')+`<div class="row"><button class="r" onclick="delRole('${r.id}')">${t('del')}</button></div></fieldset></div></div>`}
+const selRole=()=>G().roles.find(r=>r.id===S_rsel);
+function addRole(){if(!need(P.ROLES))return;const id=nid();S_rsel=id;mut(()=>{G().roles.push({id,name:t('newrole'),color:COL[Math.floor(Math.random()*7)],perm:64|128,badge:''});audit('ROLE_CREATE')});srvSet('roles')}
+function setRole(f,v){const r=selRole();if(!canEditRole(r))return;const id=r.id;mut(()=>{G().roles.find(x=>x.id===id)[f]=v;audit('ROLE_UPDATE',r.name)});srvSet('roles')}
+function setPerm(bit,on){const r=selRole();if(!canEditRole(r))return;if(on&&!isOwner(UID)&&!(perms(UID)&(bit|1))){toast(t('noperm'),1);return srvSet('roles')}const id=r.id;mut(()=>{const x=G().roles.find(y=>y.id===id);x.perm=on?x.perm|bit:x.perm&~bit;audit('ROLE_UPDATE',x.name)});srvSet('roles')}
+function mvRole(id,d){const g=G(),i=g.roles.findIndex(r=>r.id===id),j=i+d;if(j<0||j>=g.roles.length)return;if(!canEditRole(g.roles[i])||!canEditRole(g.roles[j]))return toast(t('noperm'),1);mut(()=>{const a=G().roles;[a[i],a[j]]=[a[j],a[i]];audit('ROLE_REORDER')});srvSet('roles')}
+function delRole(id){const r=selRole();if(!canEditRole(r))return;if(G().roles.length<2)return toast(t('lastrole'),1);S_rsel=null;mut(()=>{const g=G();g.roles=g.roles.filter(x=>x.id!==id);const low=g.roles.at(-1).id;Object.values(g.mem).forEach(m=>{m.roles=m.roles.filter(x=>x!==id);if(!m.roles.length)m.roles=[low]});audit('ROLE_DELETE',r.name)});srvSet('roles')}
+
+/* ---------- mock gateway (test mode) ---------- */
+function gw(){clearInterval(timer);timer=setInterval(()=>{if(!UID||!ME()||!ME().test||!UI.ref)return;const ref=UI.ref,l=['Привет!','Hello there','gg wp','Проверка связи 📡','Nice!'];
+ UI.typ[ref+':mock']=Date.now();paintTyp();setTimeout(()=>{(UI.mock[ref]=UI.mock[ref]||[]).push({id:nid(),u:'mock',t:l[Math.floor(Math.random()*l.length)],ts:Date.now(),mock:1});ev('recv','MESSAGE_CREATE',{author:'MockUser'});if(UI.ref===ref)paintMsgs(ref)},1200)},6000)}
+
+/* ---------- init ---------- */
+</script>
+<script>
+/* ===== Aethra v3 · part 1 ===== */
+Object.assign(T,{
+pos_p_dev:['Разработчик','Developer'],pos_p_adm:['Администратор','Administrator'],pos_p_mod:['Модератор','Moderator'],pos_p_sup:['Агент поддержки','Support agent'],
+ab_early:['Ранний участник','Early member'],ab_veteran:['Ветеран (7+ дней)','Veteran (7+ days)'],ab_social:['3+ друга','3+ friends'],ab_owner:['Владелец сервера','Server owner'],ab_aurum:['Держатель Aurum','Aurum holder'],ab_pulse:['Поддерживает сервер Pulse','Pulse supporter'],
+forever:['навсегда','forever'],quota:['Хранилище переполнено','Storage is full'],offline:['Не в сети','Offline'],
+alreadysent:['Запрос уже отправлен — ждите ответа','Request already sent — wait for a reply'],reqpending:['Запрос отправлен','Request pending'],acceptfr:['Принять запрос','Accept request'],frclosed:['Пользователь не принимает запросы','User does not accept requests'],
+appbanned:['Аккаунт заблокирован.','Account suspended.'],micerr:['Нет доступа к микрофону','Microphone unavailable'],calling:['звонит вам','is calling you'],accept:['Принять','Accept'],decline:['Отклонить','Decline'],
+badcode:['Неверный код','Wrong code'],unlocked:['Доступ разработчика открыт','Developer access unlocked'],
+n_ping:['Упоминания (@имя)','Mentions (@name)'],n_every:['@everyone и @here','@everyone & @here']});
+const SEC={s:'053a596bcfe5d1d3584c488f',h:'319fac17d1e2a166e8bd3adccaba75e93eac686d535e7db38ff02c1faf6eddec',n:210000};
+const POS0={p_dev:{name:'Developer',badge:'👨‍💻',color:'#7c5cff',rank:4},p_adm:{name:'Admin',badge:'🛡️',color:'#ef4466',rank:3},p_mod:{name:'Moderator',badge:'🔨',color:'#34d399',rank:2},p_sup:{name:'Support',badge:'🎧',color:'#22d3ee',rank:1}};
+function plat(){const p=DB.plat=DB.plat||{pos:{},badges:{},tickets:[],bans:{},ann:''};Object.entries(POS0).forEach(([k,v])=>{if(!p.pos[k])p.pos[k]={id:k,sys:1,...v}});return p}
+const posOf=u=>u&&u.pos&&plat().pos[u.pos],rank=u=>posOf(u)?posOf(u).rank:0,posName=p=>p.sys?t('pos_'+p.id):p.name;
+const aur=u=>!!(u&&u.aurum&&(!u.aurum.until||u.aurum.until>Date.now())),noAur=u=>!!(u&&u.noAurum&&(!u.noAurum.until||u.noAurum.until>Date.now()));
+const canAnim=u=>aur(u)||rank(u)>=3,untilTxt=x=>!x?'':(!x.until?t('forever'):new Date(x.until).toLocaleDateString(L));
+const safeImg=s=>/^(data:image\/[\w+.-]+;base64,[\w+\/=]+|https?:\/\/[^\s'"()<>]+)$/.test(s||'')?s:'';
+const ic=x=>safeImg(x)?`<img src="${safeImg(x)}">`:esc(x||'');
+function load(){try{DB=JSON.parse(localStorage.getItem('aethra'))}catch(e){}if(!DB||!DB.users)DB={users:{},srv:{},dm:{},inv:{}};plat();
+ Object.values(DB.srv).forEach(s=>{s.pulses=s.pulses||{};s.roles.forEach(r=>{if(!r.m3){r.m3=1;if(r.perm&64)r.perm|=512|1024}})});
+ Object.values(DB.users).forEach(u=>{u.nf=u.nf||{sound:1,desk:0,dm:1,ping:1,every:1};u.mread=u.mread||{};u.pv=u.pv||{fr:1,dm:1};u.ui=u.ui||{fs:15,cp:0,rm:0};u.gb=u.gb||[];u.vs=u.vs||{}})}
+function save(){try{localStorage.setItem('aethra',JSON.stringify(DB))}catch(e){toast(t('quota'),1)}}
+async function devUnlock(code){try{const e=new TextEncoder(),k=await crypto.subtle.importKey('raw',e.encode(code.trim()),'PBKDF2',false,['deriveBits']),b=await crypto.subtle.deriveBits({name:'PBKDF2',salt:e.encode(SEC.s),iterations:SEC.n,hash:'SHA-256'},k,256),h=[...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,'0')).join('');
+ if(h!==SEC.h)return toast(t('badcode'),1);mut(()=>{ME().pos='p_dev'});toast(t('unlocked'));usrSet('accts')}catch(x){toast('crypto unavailable',1)}}
+
+/* images */
+function imgPick(o,cb){const i=document.createElement('input');i.type='file';i.accept='image/*';i.onchange=()=>{const f=i.files[0];if(!f)return;
+ if(f.type==='image/gif'&&o.anim){if(f.size>9e5)return toast('GIF ≤ 900KB',1);const r=new FileReader();r.onload=()=>cb(r.result);r.readAsDataURL(f)}
+ else{const im=new Image();im.onload=()=>{const c=document.createElement('canvas'),w=o.w,h=o.h||o.w,sc=Math.max(w/im.width,h/im.height),dw=im.width*sc,dh=im.height*sc;c.width=w;c.height=h;c.getContext('2d').drawImage(im,(w-dw)/2,(h-dh)/2,dw,dh);cb(c.toDataURL(o.png?'image/png':'image/jpeg',.86))};im.src=URL.createObjectURL(f)}};i.click()}
+const gOwner=g=>U(g.owner),svAnim=g=>svLvl(g)>=2||canAnim(gOwner(g)),svBan=g=>svLvl(g)>=1||canAnim(gOwner(g));
+function pickFor(k,after){const m=ME(),g=UI.v!=='home'?G():null;
+ const M={av:[{w:256,anim:canAnim(m)},d=>ME().img=d],bn:[{w:960,h:320,anim:canAnim(m)},d=>ME().bimg=d],si:[{w:256,anim:g&&svAnim(g)},d=>G().icon=d],sb:[{w:960,h:320,anim:g&&svAnim(g)},d=>G().banner=d]}[k];
+ if((k==='si'||k==='sb')&&!need(P.CH))return;if(k==='sb'&&!svBan(g))return toast(t('needlvl'),1);
+ imgPick(M[0],d=>{mut(()=>M[1](d));after&&after()})}
+function urlFor(k,after){if(!canAnim(ME())&&!(UI.v!=='home'&&svAnim(G())))return toast(t('needaur'),1);const u=prompt('URL (https://…)');if(!u||!safeImg(u))return;mut(()=>{({av:()=>ME().img=u,bn:()=>ME().bimg=u,si:()=>G().icon=u,sb:()=>G().banner=u})[k]()});after&&after()}
+function clrImg(k,after){mut(()=>{({av:()=>delete ME().img,bn:()=>delete ME().bimg,si:()=>delete G().icon,sb:()=>delete G().banner})[k]()});after&&after()}
+
+/* presence */
+let LA=Date.now();['mousemove','keydown','click'].forEach(e=>addEventListener(e,()=>{LA=Date.now()},{passive:true}));
+function beat(){if(!UID)return;try{const p=getPres();p[UID]={t:Date.now(),a:LA};localStorage.setItem('ae_p',JSON.stringify(p));PR=p}catch(e){}}
+const estat=u=>{if(u.status==='invisible')return u.id===UID?'invisible':'offline';const p=PR[u.id];if(!p||Date.now()-p.t>14000)return'offline';return(u.status==='online'&&Date.now()-p.a>3e5)?'idle':u.status};
+const isOn=u=>['online','idle','dnd'].includes(estat(u)),stc=u=>({online:'#2ecc8f',idle:'#f0b232',dnd:'#ef4466'})[estat(u)]||'#6b7089',sttext=u=>t(estat(u));
+function av(u,s=38){const im=safeImg(u.img),gif=im.startsWith('data:image/gif')&&!canAnim(u)||/\.gif(\?|$)/i.test(im)&&!canAnim(u),ok=im&&!gif;
+ return `<div class="av ${aur(u)?'aurav':''}" style="--s:${s}px;background:${ok?`url('${im}') center/cover`:`linear-gradient(135deg,${u.color},${u.banner2||u.color})`}">${ok?'':esc((u.name||'?')[0].toUpperCase())}<i style="background:${stc(u)}"></i></div>`}
+
+/* badges */
+function autoBadges(u){const b=[];if(u.early)b.push('early');if(Date.now()-u.ts>6048e5)b.push('veteran');if(u.fr.length>=3)b.push('social');if(Object.values(DB.srv).some(s=>s.owner===u.id))b.push('owner');if(aur(u))b.push('aurum');if(Object.values(DB.srv).some(s=>s.pulses&&s.pulses[u.id]))b.push('pulse');return b}
+const AUTO={early:['🚀','#7c5cff','#22d3ee'],veteran:['💎','#22d3ee','#60a5fa'],social:['🤝','#f472b6','#fb7185'],owner:['🏰','#fbbf24','#f97316'],aurum:['✨','#fbbf24','#f472b6'],pulse:['⚡','#34d399','#22d3ee']};
+const bdg=(l,i,c1,c2)=>`<span class="bdgi" title="${esc(l)}" style="--c1:${c1};--c2:${c2}">${ic(i)}</span>`;
+function badgeHtml(u){let h='';const p=posOf(u);if(p)h+=bdg(posName(p),p.badge,p.color,p.color);
+ (u.gb||[]).forEach(id=>{const b=plat().badges[id];if(b)h+=bdg(b.name,b.img||b.emoji,b.color,b.color)});
+ return h+autoBadges(u).map(k=>bdg(t('ab_'+k),AUTO[k][0],AUTO[k][1],AUTO[k][2])).join('')}
+
+/* server helpers */
+function svLvl(g){let n=0;Object.entries(g.pulses||{}).forEach(([u,c])=>{if(aur(U(u)))n+=Math.min(c,2)});return n>=14?3:n>=7?2:n>=2?1:0}
+const svPulses=g=>Object.entries(g.pulses||{}).reduce((a,[u,c])=>a+(aur(U(u))?Math.min(c,2):0),0);
+const pulseUsed=u=>Object.values(DB.srv).reduce((a,s)=>a+((s.pulses||{})[u]||0),0),pulseFree=u=>(aur(U(u))?2:0)-pulseUsed(u);
+function chPerm(u,c,k){if(!G().mem[u])return false;if(isOwner(u)||perms(u)&1)return true;const b={view:P.VIEW,send:P.SEND,attach:P.ATTACH,ping:P.PING}[k],ow=c.ow||{};let ok=!!(perms(u)&b);if(ow.e&&ow.e[k]!==undefined)ok=!!ow.e[k];let a=0,d=0;MR(u).roles.forEach(r=>{const v=ow[r]&&ow[r][k];if(v===1)a=1;if(v===0)d=1});return a?true:d?false:ok}
+function canView(u,c){if(!chPerm(u,c,'view'))return false;if(!c.priv||can(u,P.MSG)||can(u,P.KICK))return true;return MR(u).roles.some(r=>c.ow&&c.ow[r]&&c.ow[r].view===1)}
+function nameTag(uid){if(UI.v==='home'||!G().mem[uid])return['',''];const r=topRole(uid),ns=MR(uid).ns||'';let st=`color:${r.color};`,cl='';
+ if(r.color2)st=`background:linear-gradient(90deg,${r.color},${r.color2});-webkit-background-clip:text;background-clip:text;color:transparent;`;
+ if(r.glow)st+=`filter:drop-shadow(0 0 5px ${r.color});`;
+ if(ns==='rainbow'){cl='rb';st=''}else if(ns==='shimmer'){cl='sh2';st=`--c:${r.color};`}else if(ns==='neon')st=`color:#fff;text-shadow:0 0 6px ${r.color},0 0 14px ${r.color};`;else if(ns==='grad')st=`background:linear-gradient(90deg,${r.color},#f472b6,#22d3ee);-webkit-background-clip:text;background-clip:text;color:transparent;`;
+ return[cl,st]}
+
+/* notifications / pings */
+let AC,LASTCHK=Date.now();
+function beep(){try{AC=AC||new(window.AudioContext||window.webkitAudioContext)();const o=AC.createOscillator(),g=AC.createGain(),n=AC.currentTime;o.type='sine';o.frequency.setValueAtTime(880,n);o.frequency.setValueAtTime(1175,n+.09);g.gain.setValueAtTime(.18,n);g.gain.exponentialRampToValueAtTime(.001,n+.35);o.connect(g);g.connect(AC.destination);o.start();o.stop(n+.35)}catch(e){}}
+const rxEsc=s=>s.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');
+const hasPing=(x,me)=>new RegExp('@'+rxEsc(me.name)+'(?![\\w-])','i').test(x||'')||(!!me.nf.every&&/@(everyone|here)\b/.test(x||''));
+const mentionCnt=(s,cid)=>{const me=ME(),rd=(me.mread||{})[cid]||0;return(s.msgs[cid]||[]).filter(m=>m.u!==UID&&m.ts>rd&&hasPing(m.t,me)).length};
+const srvMentions=s=>Object.keys(s.msgs).reduce((a,c)=>a+mentionCnt(s,c),0);
+function scanNew(){const me=ME(),since=LASTCHK;LASTCHK=Date.now();if(!me||me.status==='dnd')return;const f=[],foc=document.hasFocus();
+ if(me.nf.dm)Object.keys(DB.dm).forEach(k=>{if(!k.split('_').includes(UID))return;DB.dm[k].forEach(m=>{if(m.u!==UID&&m.ts>since&&!me.bl.includes(m.u)&&!me.ig.includes(m.u)&&!(UI.ref==='d:'+k&&foc))f.push({m,ic:'💬',tt:U(m.u)?.name})})});
+ if(me.nf.ping)Object.values(DB.srv).forEach(s=>{if(!s.mem[UID]||s.mute)return;Object.entries(s.msgs).forEach(([cid,l])=>l.forEach(m=>{if(m.u!==UID&&m.ts>since&&hasPing(m.t,me)&&!me.bl.includes(m.u)&&!(UI.ref==='c:'+cid&&foc))f.push({m,ic:'🔔',tt:(U(m.u)?.name||'?')+' · '+s.name})}))});
+ if(f.length)alertUser(f)}
+function alertUser(f){const me=ME(),x=f.at(-1);if(me.nf.sound)beep();toast(x.ic+' '+x.tt+': '+(x.m.t||'📎').replace(/[*`]/g,'').slice(0,60));
+ document.body.classList.add('pfx');setTimeout(()=>document.body.classList.remove('pfx'),1300);
+ if(me.nf.desk&&!document.hasFocus()&&window.Notification&&Notification.permission==='granted'){try{new Notification(x.tt,{body:(x.m.t||'').slice(0,100)})}catch(e){}}
+ if(!document.title.startsWith('🔔'))document.title='🔔 '+document.title}
+addEventListener('focus',()=>{document.title=document.title.replace(/^🔔 /,'')});
+function onStorage(e){if(!UID)return;if(e.key==='aethra'){load();if(!ME()){logout();return}scanNew();render()}else if(e.key==='ae_p'){PR=getPres();sideR();memR()}else if(e.key==='ae_sig'&&e.newValue){try{vsig(JSON.parse(e.newValue))}catch(x){}}}
+function fmt(s){return esc(s).replace(/`([^`]+)`/g,'<code>$1</code>').replace(/\*\*(.+?)\*\*/g,'<b>$1</b>').replace(/\*(.+?)\*/g,'<i>$1</i>').replace(/aethra\.gg\/invite\/(\w+)/g,'<a class="invl" onclick="joinCode(\'$1\')">▶ '+t('joinsrv')+'</a>').replace(/(https?:\/\/[^\s<]+)/g,'<a href="$1" target="_blank" rel="noopener">$1</a>').replace(/@([^\s<@]+)/g,(m,n)=>(n==='everyone'||n==='here'||Object.values(DB.users).some(u=>u.name===n))?`<span class="mn">@${n}</span>`:m)}
+
+/* voice (WebRTC mesh, signaling through localStorage events between tabs) */
+const V={room:null,stream:null,peers:{},speak:{},pm:{},audio:{},ctx:null,mute:false,deaf:false,sid:Math.random().toString(36).slice(2)};
+function sig(m){try{localStorage.setItem('ae_sig',JSON.stringify({...m,f:V.sid,n:Math.random()}))}catch(e){}}
+async function joinRoom(room,label){if(V.room)leaveRoom();
+ try{const o=ME().vs||{};V.stream=await navigator.mediaDevices.getUserMedia({audio:{deviceId:o.dev?{exact:o.dev}:undefined,echoCancellation:o.echo!==0,noiseSuppression:o.ns!==0}})}catch(e){return toast(t('micerr'),1)}
+ V.room=room;V.label=label;V.mute=false;V.deaf=false;V.pm={};watch(V.stream,UID);sig({t:'hello',room,uid:UID});dockR();sideR()}
+function leaveRoom(){if(!V.room)return;sig({t:'bye',room:V.room});Object.keys(V.peers).forEach(dropPeer);V.stream&&V.stream.getTracks().forEach(x=>x.stop());V.stream=null;const r=V.room;V.room=null;V.speak={};
+ if(r[0]==='v'){const[,sid]=r.split(':');load();const g=DB.srv[sid];if(g){Object.keys(g.voice||{}).forEach(k=>g.voice[k]=g.voice[k].filter(x=>x!==UID));save()}}dockR();render()}
+function mkPeer(sid,uid,off){if(V.peers[sid])return V.peers[sid];const pc=new RTCPeerConnection({iceServers:[{urls:'stun:stun.l.google.com:19302'}]}),p=V.peers[sid]={pc,uid,q:[]};
+ V.stream.getTracks().forEach(tr=>pc.addTrack(tr,V.stream));
+ pc.onicecandidate=e=>{if(e.candidate)sig({t:'ice',to:sid,room:V.room,c:e.candidate})};
+ pc.ontrack=e=>{const a=new Audio();a.srcObject=e.streams[0];a.volume=(ME().vs||{}).vol??1;a.muted=V.deaf;V.audio[sid]=a;a.play().catch(()=>{});watch(e.streams[0],uid)};
+ pc.onconnectionstatechange=()=>{if(['failed','closed'].includes(pc.connectionState))dropPeer(sid)};
+ if(off)pc.createOffer().then(o=>pc.setLocalDescription(o)).then(()=>sig({t:'offer',to:sid,room:V.room,sdp:pc.localDescription,uid:UID}));
+ sideR();return p}
+function dropPeer(sid){const p=V.peers[sid];if(!p)return;try{p.pc.close()}catch(e){}delete V.speak[p.uid];delete V.peers[sid];if(V.audio[sid]){V.audio[sid].srcObject=null;delete V.audio[sid]}sideR()}
+async function vsig(m){if(m.f===V.sid)return;if(m.t==='ring'){if(m.to===UID&&!V.room)ringModal(m);return}
+ if(!V.room||m.room!==V.room)return;
+ if(m.t==='hello'){mkPeer(m.f,m.uid,true);sig({t:'state',room:V.room,uid:UID,mute:V.mute,deaf:V.deaf})}
+ else if(m.t==='bye')dropPeer(m.f);
+ else if(m.t==='state'){V.pm[m.uid]={mute:m.mute,deaf:m.deaf};sideR()}
+ else if(m.to===V.sid){const p=V.peers[m.f]||mkPeer(m.f,m.uid,false),fl=async()=>{for(const c of p.q.splice(0))try{await p.pc.addIceCandidate(c)}catch(e){}};
+  if(m.t==='offer'){await p.pc.setRemoteDescription(m.sdp);await fl();const a=await p.pc.createAnswer();await p.pc.setLocalDescription(a);sig({t:'answer',to:m.f,room:V.room,sdp:p.pc.localDescription,uid:UID})}
+  else if(m.t==='answer'){await p.pc.setRemoteDescription(m.sdp);await fl()}
+  else if(m.t==='ice'&&m.c){if(p.pc.remoteDescription)try{await p.pc.addIceCandidate(m.c)}catch(e){}else p.q.push(m.c)}}}
+function watch(s,uid){try{V.ctx=V.ctx||new(window.AudioContext||window.webkitAudioContext)();const an=V.ctx.createAnalyser();an.fftSize=512;V.ctx.createMediaStreamSource(s).connect(an);const d=new Uint8Array(an.fftSize);
+ const iv=setInterval(()=>{if(!V.room||!s.active){clearInterval(iv);return}an.getByteTimeDomainData(d);let m=0;d.forEach(x=>m=Math.max(m,Math.abs(x-128)));const sp=m>12&&!(uid===UID&&(V.mute||V.deaf));if(!!V.speak[uid]!==sp){V.speak[uid]=sp;sideR()}},180)}catch(e){}}
+function vState(){if(V.stream)V.stream.getAudioTracks().forEach(x=>x.enabled=!V.mute&&!V.deaf);Object.values(V.audio).forEach(a=>a.muted=V.deaf);sig({t:'state',room:V.room,uid:UID,mute:V.mute,deaf:V.deaf});dockR();sideR()}
+function toggleMute(){if(!V.room){UI.mic=!UI.mic;return dockR()}V.mute=!V.mute;vState()}
+function toggleDeaf(){if(!V.room){UI.deaf=!UI.deaf;return dockR()}V.deaf=!V.deaf;vState()}
+async function joinVoice(cid){const g=G(),c=g.ch.find(x=>x.id===cid);if(!chPerm(UID,c,'view'))return toast(t('noperm'),1);
+ await joinRoom('v:'+g.id+':'+cid,g.name+' · '+c.name);if(V.room){mut(()=>{const s=G();s.voice=s.voice||{};Object.keys(s.voice).forEach(k=>s.voice[k]=s.voice[k].filter(x=>x!==UID));(s.voice[cid]=s.voice[cid]||[]).push(UID)})}}
+function leaveVoice(){leaveRoom()}
+async function startCall(uid){const room='d:'+dmKey(UID,uid);await joinRoom(room,'📞 '+U(uid).name);if(V.room){sig({t:'ring',to:uid,room,uid:UID});toast('📞 '+U(uid).name+'…')}}
+function ringModal(m){const u=U(m.uid);if(!u||ME().status==='dnd')return;beep();open(`<h2>📞 ${esc(u.name)} ${t('calling')}</h2><div class="row"><button onclick="closeM();acceptCall('${m.room}','${m.uid}')">${t('accept')}</button><button class="r" onclick="closeM()">${t('decline')}</button></div>`)}
+function acceptCall(room,uid){openDM(uid);joinRoom(room,'📞 '+U(uid).name)}
+addEventListener('beforeunload',()=>{if(V.room)sig({t:'bye',room:V.room})});
+
+/* accounts */
+const saved=()=>{try{return JSON.parse(localStorage.getItem('ae_accts')||'[]')}catch(e){return[]}};
+function addSaved(id){try{localStorage.setItem('ae_accts',JSON.stringify([id,...saved().filter(x=>x!==id)]))}catch(e){}}
+function rmSaved(id){try{localStorage.setItem('ae_accts',JSON.stringify(saved().filter(x=>x!==id)))}catch(e){}}
+function switchTo(id){load();if(!DB.users[id]){rmSaved(id);return authText()}if(V.room)leaveRoom();closeM();try{sessionStorage.setItem('ae_uid',id)}catch(e){}UID=id;start()}
+function addAcct(){closeM();const k=UID;try{sessionStorage.removeItem('ae_uid')}catch(e){}UID=null;$('#auth').style.display='flex';authText()}
+function start(){load();const b=plat().bans[UID];if(b&&(!b.until||b.until>Date.now())){const id=UID;UID=null;authText();$('#ae').textContent=t('appbanned')+' '+(b.reason||'')+' '+(b.until?untilTxt(b):t('forever'));return}
+ L=ME().lang||L;addSaved(UID);try{sessionStorage.setItem('ae_uid',UID)}catch(e){}$('#auth').style.display='none';Object.assign(UI,{v:'home',dm:null,tab:'online',ref:null,fresh:1,q:'',tq:'',post:null,tf:'open'});LASTCHK=Date.now();beat();render();gw();ev('recv','READY',{user:UID})}
+function authText(){$('#tag').textContent=t('tagline');$('#tl').textContent=t('login');$('#tr').textContent=t('register');$('#tl').className=AREG?'':'on';$('#tr').className=AREG?'on':'';$('#an').placeholder=t('username');$('#ap').placeholder=t('password');$('#ab').textContent=t(AREG?'register':'login');$('#ae').textContent='';
+ load();const s=saved().filter(i=>DB.users[i]);$('#asv').innerHTML=s.length?`<div class="mu" style="font-size:12px">${t('savedacc')}</div>`+s.map(i=>`<div class="sacc" onclick="switchTo('${i}')">${av(DB.users[i],30)}<span>${esc(DB.users[i].name)}</span><b onclick="event.stopPropagation();rmSaved('${i}');authText()">✕</b></div>`).join(''):''}
+function purgeUser(id){load();Object.values(DB.srv).forEach(s=>{if(s.owner===id){const o=Object.keys(s.mem).find(x=>x!==id);if(o){s.owner=o;s.mem[o].roles=[s.roles[0].id]}else delete DB.srv[s.id]}if(DB.srv[s.id]){delete s.mem[id];0}});
+ Object.keys(DB.dm).forEach(k=>{if(k.split('_').includes(id))delete DB.dm[k]});Object.values(DB.users).forEach(u=>['fr','inc','out','bl','ig'].forEach(f=>u[f]=u[f].filter(x=>x!==id)));delete DB.users[id];save();rmSaved(id)}
+async function delAcct(){const p=$('#dpw').value;if(await hp(p)!==ME().hash)return toast(t('e_cred'),1);if(!confirm(t('delacct')+'?'))return;const id=UID;if(V.room)leaveRoom();purgeUser(id);logout();toast(t('done'))}
+
+Object.assign(T,{
+save:['Сохранить','Save'],access:['Специальные возможности','Accessibility'],accts:['Аккаунты','Accounts'],addacct:['Добавить аккаунт','Add account'],allow:['Разрешить','Allow'],
+animok:['Анимированные GIF разрешены','Animated GIFs are allowed'],animno:['Анимация — для Aurum, админов и разработчиков','Animation is for Aurum, admins and developers'],
+announce:['Объявление для всех','Global announcement'],appban:['Заблокировать в приложении','Ban from app'],applypulse:['Применить Pulse','Apply Pulse'],assigned:['Назначен:','Assigned:'],unassigned:['Не назначен','Unassigned'],
+aur_how:['Aurum нельзя купить — его выдаёт персонал приложения (от модератора) на срок или навсегда.','Aurum cannot be bought — app staff (moderator+) grant it for a period or forever.'],
+aur_off:['Aurum не активен','Aurum is not active'],aur_on:['Aurum активен','Aurum is active'],until:['до','until'],
+perks:['Возможности','Perks'],pk1:['Анимированный аватар и баннер профиля','Animated avatar & profile banner'],pk2:['Золотая рамка аватара и значок ✨','Golden avatar ring & ✨ badge'],pk3:['2 Pulse для усиления серверов','2 Pulses to power up servers'],pk4:['Загрузка GIF для иконки и баннера своих серверов','GIF icon & banner on servers you own'],
+free:['свободно','free'],forbidden:['Выдача запрещена','Granting is forbidden'],avatar_img:['Загрузить аватар','Upload avatar'],banner_img:['Баннер','Banner'],
+badgesm:['Значки','Badges'],banmin:['Минут блокировки (0 — навсегда, только админ)','Minutes (0 = forever, admin only)'],reason:['Причина','Reason'],boosters:['Бустеры','Boosters'],
+chperm:['Права канала по ролям','Channel permissions by role'],tri_hint:['— наследовать · ✔ разрешить · ✖ запретить','— inherit · ✔ allow · ✖ deny'],o_view:['Видеть','View'],o_send:['Писать','Send'],o_attach:['Файлы','Files'],o_ping:['Пинговать','Ping'],
+ctrl:['Центр управления','Control center'],current:['текущий','current'],danger:['Опасная зона','Danger zone'],default:['По умолчанию','Default'],delacct:['Удалить аккаунт','Delete account'],
+describe:['Опишите проблему','Describe the issue'],devaccess:['Доступ разработчика','Developer access'],devon:['Доступ разработчика активен','Developer access is active'],unlock:['Открыть','Unlock'],
+dmclosed:['Пользователь принимает ЛС только от друзей','User accepts DMs from friends only'],expired:['Aurum истёк','Aurum expired'],forbid:['Запретить Aurum','Forbid Aurum'],forget:['Забыть','Forget'],
+fromfile:['С компьютера','From file'],fsize:['Размер шрифта','Font size'],grad2:['Градиент','Gradient'],glow:['Свечение ника (только на серверах)','Name glow (servers only)'],grant:['Выдать','Grant'],icon:['Иконка','Icon'],imgready:['Изображение готово','Image ready'],
+locked:['Ветка закрыта','Thread locked'],lv1:['Баннер сервера','Server banner'],lv2:['Анимированные иконка и баннер','Animated icon & banner'],lv3:['Максимальный уровень','Max level'],
+n_test:['Проверить звук','Test sound'],n_sound:['Звук уведомлений','Notification sound'],n_desk:['Уведомления рабочего стола','Desktop notifications'],n_deskd:['Когда вкладка не в фокусе','When the tab is not focused'],n_dm:['Личные сообщения','Direct messages'],
+needaur:['Нужен Aurum или права администратора','Aurum or admin rights required'],needlvl:['Нужен уровень Pulse 1+','Pulse level 1+ required'],needtag:['Выберите хотя бы один тег','Pick at least one tag'],
+newbadge:['Новый значок','New badge'],newpos:['Новая должность','New position'],newticket:['Создать обращение','Create ticket'],noattach:['Нет права отправлять файлы','No permission to send files'],noping:['Нет права пинговать','No permission to ping'],notk:['Обращений нет','No tickets'],
+nstyle:['Стиль ника','Name style'],ns_none:['Обычный','Plain'],ns_grad:['Градиент','Gradient'],ns_neon:['Неон','Neon'],ns_shimmer:['Мерцание','Shimmer'],ns_rainbow:['Радуга','Rainbow'],
+position:['Должность','Position'],positions:['Должности','Positions'],privacy:['Конфиденциальность','Privacy'],pulses:['Pulse','Pulses'],rank_hint:['R1 — поддержка, R2 — модератор, R3 — админ. Значки должностей выдаёт только разработчик.','R1 support, R2 moderator, R3 admin. Only the developer assigns staff positions.'],
+reqtag:['Тег обязателен для поста','Require a tag on posts'],savedacc:['Сохранённые аккаунты','Saved accounts'],servers:['Серверы','Servers'],srv_anim:['Анимация: Pulse Lv2 или владелец с Aurum','Animation: Pulse Lv2 or an Aurum owner'],
+subject:['Тема','Subject'],support:['Поддержка','Support'],switch:['Переключиться','Switch'],tagname:['Название тега','Tag name'],tags:['Теги','Tags'],take:['Взять','Take'],tickets:['Тикеты','Tickets'],
+tk_open:['Открытые','Open'],tk_pending:['В ожидании','Pending'],tk_closed:['Закрытые','Closed'],tk_mine:['Мои','Mine'],tk_all:['Все','All'],c_gen:['Общий вопрос','General'],c_bug:['Ошибка','Bug'],c_acc:['Аккаунт','Account'],c_rep:['Жалоба','Report'],
+users:['Пользователи','Users'],v_in:['Устройство ввода','Input device'],v_mic:['Проверка микрофона','Mic test'],v_note:['Голос работает между вкладками одного браузера (WebRTC). Для разных устройств нужен сервер сигналинга.','Voice works between tabs of the same browser (WebRTC). Different devices need a signaling server.'],v_vol:['Громкость собеседников','Output volume'],v_ns:['Шумоподавление','Noise suppression'],v_echo:['Эхоподавление','Echo cancellation'],
+voice:['Голос','Voice'],compact:['Компактный режим','Compact mode'],motion:['Уменьшить анимации','Reduce motion'],pv_fr:['Принимать запросы в друзья','Accept friend requests'],pv_dm:['ЛС от не-друзей','DMs from non-friends'],
+sort_new:['Новые','Newest'],sort_act:['По активности','Recent activity'],sort_top:['По лайкам','Most liked'],name:['Имя','Name'],newrole:['Новая роль','New role'],
+p_ATTACH:['Отправка файлов','Attach files'],p_PING:['Упоминание людей (@)','Mention people (@)'],newbadge2:['','']});
+
+function copy(x){let ok=false;try{const a=document.createElement('textarea');a.value=x;a.style.cssText='position:fixed;opacity:0';document.body.appendChild(a);a.select();ok=document.execCommand('copy');a.remove()}catch(e){}if(ok)return toast(t('copied'));try{navigator.clipboard.writeText(x).then(()=>toast(t('copied')),()=>prompt('',x))}catch(e){prompt('',x)}}
+/* ===== Aethra v3 · part 2 ===== */
+function railR(){const un=totalUnread();
+ $('#rail').innerHTML=`<div class="sv hm ${UI.v==='home'?'on':''}" onclick="goHome()" title="${t('home')}"><div class="orb"></div>${un?`<b class="nb">${un}</b>`:''}</div><div class="sep"></div>`+Object.values(DB.srv).filter(s=>s.mem[UID]).map(s=>{const mc=srvMentions(s),im=safeImg(s.icon),ok=im&&!(im.startsWith('data:image/gif')&&!svAnim(s));return `<div class="sv ${UI.v===s.id?'on':''}" style="--g:${s.color};${ok?`background:url('${im}') center/cover`:''}" onclick="goSrv('${s.id}')" title="${esc(s.name)}">${ok?'':esc(s.name.slice(0,2))}${mc?`<b class="nb">${mc}</b>`:''}</div>`}).join('')+`<div class="sv add" onclick="addSrv()" title="${t('addsrv')}">＋</div>`}
+function sideR(){if(!UID||!ME())return;
+ if(UI.v==='home'){$('#sn').style.cssText='';$('#sn').innerHTML=`<input id="fq" class="fq" placeholder="${t('find')}" value="${esc(UI.q)}" oninput="UI.q=this.value;$('#chs').innerHTML=homeList()" onkeydown="if(event.key==='Enter')findDM()" onclick="event.stopPropagation()">`;$('#sn').onclick=null;$('#chs').innerHTML=homeList();return}
+ const g=G(),m=UID,im=safeImg(g.banner),lv=svLvl(g);
+ $('#sn').innerHTML=`<span style="display:flex;gap:8px;align-items:center;min-width:0">${safeImg(g.icon)?`<img class="sic" src="${safeImg(g.icon)}">`:''}<span style="overflow:hidden;text-overflow:ellipsis">${esc(g.name)}</span>${lv?`<span class="lv">Lv${lv}</span>`:''}</span><span>⌄</span>`;
+ $('#sn').onclick=srvMenu;$('#sn').style.cssText=im&&svBan(g)?`background:linear-gradient(#0005,#000b),url('${im}') center/cover;min-height:92px;color:#fff;align-items:flex-end`:'';
+ const row=c=>{const mc=c.type!=='voice'?mentionCnt(g,c.id):0,sp=u=>V.speak[u]?'spk':'',mu=u=>(u===UID?(V.mute||V.deaf):V.pm[u]&&(V.pm[u].mute||V.pm[u].deaf))?' 🔇':'';
+  return `<div class="ch ${c.id===UI.ch&&c.type!=='voice'?'on':''}" onclick="pickCh('${c.id}')">${c.priv&&c.type==='text'?'🔒':ICON[c.type]} ${esc(c.name)}${mc?`<b class="nb">${mc}</b>`:''}${can(m,P.CH)?`<span class="gear" onclick="event.stopPropagation();chSet('${c.id}')">⚙️</span>`:''}</div>`+(c.type==='voice'?((g.voice||{})[c.id]||[]).filter(u=>U(u)).map(u=>`<div class="vu ${sp(u)}">🎙 ${esc(nm(U(u)))}${mu(u)}</div>`).join(''):'')};
+ $('#chs').innerHTML=g.ch.filter(c=>!g.cats.find(k=>k.id===c.cat)&&canView(m,c)).map(row).join('')+g.cats.map(k=>`<div class="cat" onclick="fold('${k.id}')"><span>${k.fold?'▸':'▾'} ${esc(k.name)}</span>${can(m,P.CH)?`<span onclick="event.stopPropagation();mkChannel('${k.id}')">＋</span>`:''}</div>`+(k.fold?'':g.ch.filter(c=>c.cat===k.id&&canView(m,c)).map(row).join(''))).join('')}
+function memR(){const el=$('#mem');el.style.padding='8px';
+ if(UI.v!=='home'&&UI.mp){const g=G();el.style.display='';const all=Object.keys(g.mem).map(U).filter(Boolean),
+  row=u=>{const[cl,st]=nameTag(u.id),r=topRole(u.id);return `<div class="mm ${isOn(u)?'':'off'}" onclick="profile('${u.id}')" oncontextmenu="mctx(event,'${u.id}')">${av(u,34)}<span class="${cl}" style="${st}">${esc(nm(u))}</span><span>${r.badge||''}</span></div>`};
+  el.innerHTML=g.roles.map(r=>{const l=all.filter(u=>isOn(u)&&topRole(u.id)===r);return l.length?`<div class="cat" style="cursor:default"><span>${esc(r.name)} — ${l.length}</span></div>`+l.map(row).join(''):''}).join('')+(()=>{const l=all.filter(u=>!isOn(u));return l.length?`<div class="cat" style="cursor:default"><span>${t('offline')} — ${l.length}</span></div>`+l.map(row).join(''):''})()}
+ else if(UI.v==='home'&&UI.dm&&UI.mp&&U(UI.dm)){el.style.display='';el.style.padding='0';el.innerHTML=pcard(U(UI.dm),1)}else el.style.display='none'}
+function dockR(){const m=ME(),r=rank(m),mm=V.room?V.mute:!UI.mic,dd=V.room?V.deaf:!UI.deaf;
+ $('#dock').innerHTML=`<div class="me" onclick="usrSet('acct')">${av(m,36)}<div class="dn"><b>${esc(m.name)}</b><small>${esc(m.custom||sttext(m))}</small></div></div>${r?`<span class="ib" title="${t('ctrl')}" onclick="staffSet('tk')">🛡</span>`:''}<span class="ib" title="${t('accts')}" onclick="acctMenu(event)">⇄</span><span class="ib ${mm?'off':''}" onclick="toggleMute()">${mm?'🔇':'🎤'}</span><span class="ib ${dd?'off':''}" onclick="toggleDeaf()">🎧</span><span class="ib" onclick="usrSet('acct')">⚙️</span>`;
+ $('#vb').innerHTML=V.room?`<div class="vbar"><div class="dn"><b>● ${t('voiceon')}</b><small>${esc(V.label||'')} · ${Object.keys(V.peers).length+1}</small></div><span class="ib" onclick="leaveRoom()">📴</span></div>`:''}
+function acctMenu(e){e.stopPropagation();const it=saved().filter(i=>DB.users[i]).map(i=>({l:(i===UID?'✔ ':'')+esc(DB.users[i].name),fn:()=>{if(i!==UID)switchTo(i)}}));menu(e.clientX,e.clientY-60-it.length*34,[...it,'-',{l:'＋ '+t('addacct'),fn:addAcct}])}
+
+function msgHtml(x,ref,prev,dc){
+ const u=U(x.u)||{id:x.u,name:'?',color:'#777',banner2:'#555',status:'invisible',fr:[]},g=UI.v!=='home'&&G(),mine=x.u===UID,[cl,st]=nameTag(x.u),n=nm(u);
+ const day=d=>new Date(d).toDateString(),hm=d=>new Date(d).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
+ const ds=!prev||day(prev.ts)!==day(x.ts),grp=prev&&!ds&&prev.u===x.u&&x.ts-prev.ts<3e5,ping=!mine&&hasPing(x.t,ME());
+ const canDel=mine||(g&&ref&&ref[0]==='c'&&can(UID,P.MSG));
+ const tb=`<div class="tb">${ref?`<span onclick="emojiFor(event,'${ref}','${x.id}')">😊</span>`:''}${ref&&mine?`<span onclick="UI.edit='${x.id}';render()">✏️</span>`:''}${canDel?`<span onclick="${dc||`delMsg('${ref}','${x.id}')`}">🗑</span>`:''}</div>`;
+ const att=x.att?(x.att.d.startsWith('data:image/')?`<img class="att" src="${safeImg(x.att.d)}">`:`<a class="invl" download="${esc(x.att.n)}" href="${esc(x.att.d)}">📎 ${esc(x.att.n)}</a>`):'';
+ const body=UI.edit===x.id?`<input class="ei" id="ei" value="${esc(x.t)}" onkeydown="editKey(event,'${ref}','${x.id}')"><small>Esc / Enter</small>`:`${x.t?`<div class="tx">${fmt(x.t)}${x.ed?` <small>(${t('edited')})</small>`:''}</div>`:''}${att}`;
+ const rx=Object.entries(x.re||{}).filter(e=>e[1].length).map(([e,us])=>`<span class="rx ${us.includes(UID)?'me':''}" onclick="react('${ref}','${x.id}','${e}')">${e} ${us.length}</span>`).join('');
+ return (ds?`<div class="ds"><span>${new Date(x.ts).toLocaleDateString(L,{day:'numeric',month:'long',year:'numeric'})}</span></div>`:'')+`<div class="m ${grp?'grp':''} ${ping?'hl':''}" oncontextmenu="mctx(event,'${u.id}')">${grp?`<span class="gt">${hm(x.ts)}</span>`:av(u,40)}<div class="mb">${grp?'':`<div class="mh"><b class="${cl}" style="${st}" onclick="profile('${u.id}')">${esc(n)}</b>${posOf(u)?`<span class="tag" style="background:${posOf(u).color}">${esc(posName(posOf(u)))}</span>`:''}<span class="mt">${hm(x.ts)}</span></div>`}${body}${rx?`<div class="rxs">${rx}</div>`:''}</div>${tb}</div>`}
+function pcard(u,full){const g=UI.v!=='home'&&G(),mr=g&&g.mem[u.id],rs=mr?g.roles.filter(r=>mr.roles.includes(r.id)):[],mu=Object.values(DB.srv).filter(s=>s.mem[u.id]&&s.mem[UID]),bi=safeImg(u.bimg),ok=bi&&!(bi.startsWith('data:image/gif')&&!canAnim(u)),pp=posOf(u);
+ return `<div class="pc ${aur(u)?'aurc':''}"><div class="pbn" style="background:${ok?`url('${bi}') center/cover`:`linear-gradient(135deg,${u.banner},${u.banner2||u.banner})`}"></div><div class="pav">${av(u,84)}</div><div class="pbd"><div class="pnm">${esc(u.name)} <span class="pron">${esc(u.pron||'')}</span></div>${pp?`<div class="stf" style="--c1:${pp.color}">${ic(pp.badge)} ${esc(posName(pp))}</div>`:''}<div class="bdgs">${u.fr?badgeHtml(u):''}</div>${u.custom?`<div class="cst">${esc(u.custom)}</div>`:''}<hr><h5>${t('about')}</h5><p>${esc(u.bio||'—')}</p><h5>${t('since')}</h5><p>${new Date(u.ts).toLocaleDateString(L)}</p>`+(rs.length?`<h5>${t('roles')}</h5><div class="chips">${rs.map(r=>`<span class="chip" style="--c:${r.color}">${r.badge||'●'} ${esc(r.name)}</span>`).join('')}</div>`:'')+(mu.length&&u.id!==UID?`<h5>${t('mutual')} — ${mu.length}</h5><div class="chips">${mu.map(s=>`<span class="chip">${esc(s.name)}</span>`).join('')}</div>`:'')+(full&&u.id!==UID?`<h5>${t('note')}</h5><textarea class="nt" rows="2" placeholder="${t('notehint')}" onchange="setNote('${u.id}',this.value)">${esc(ME().notes[u.id]||'')}</textarea>`:'')+`</div></div>`}
+
+/* composer / sending */
+function attR(){$('#attc').innerHTML=UI.att?`<span class="chip">📎 ${esc(UI.att.n)} <b style="cursor:pointer" onclick="UI.att=null;attR()">✕</b></span>`:''}
+function attachPick(){if(UI.v!=='home'&&UI.ref&&UI.ref[0]==='c'&&!chPerm(UID,chan(),'attach'))return toast(t('noattach'),1);const i=document.createElement('input');i.type='file';i.onchange=()=>{const f=i.files[0];if(!f)return;
+ if(f.type.startsWith('image/')&&f.type!=='image/gif'){const im=new Image();im.onload=()=>{const sc=Math.min(1,900/Math.max(im.width,im.height)),c=document.createElement('canvas');c.width=im.width*sc;c.height=im.height*sc;c.getContext('2d').drawImage(im,0,0,c.width,c.height);UI.att={n:f.name,d:c.toDataURL('image/jpeg',.82)};attR()};im.src=URL.createObjectURL(f)}
+ else{if(f.size>4e5)return toast('≤ 400KB',1);const r=new FileReader();r.onload=()=>{UI.att={n:f.name,d:r.result};attR()};r.readAsDataURL(f)}};i.click()}
+function submit(){const v=$('#inp').value.trim(),ref=UI.ref,att=UI.att;if((!v&&!att)||!ref)return;const me=ME();
+ if(ref[0]==='d'){const p=U(partner(ref.slice(2)));if(me.bl.includes(p.id)||p.bl.includes(UID))return toast(t('blocked_n'),1);if(!p.pv.dm&&!p.fr.includes(UID))return toast(t('dmclosed'),1)}
+ else{const c=chan();if(!chPerm(UID,c,'send'))return toast(t('send403'),1);if(MR(UID).to>Date.now())return toast(t('timeout'),1);if(att&&!chPerm(UID,c,'attach'))return toast(t('noattach'),1);
+  const pg=/@(everyone|here)\b/.test(v)||Object.values(DB.users).some(u=>u.id!==UID&&G().mem[u.id]&&new RegExp('@'+rxEsc(u.name)+'(?![\\w-])','i').test(v));if(pg&&!chPerm(UID,c,'ping'))return toast(t('noping'),1);
+  const w=(c.slow||0)*1000-(Date.now()-(LAST[ref]||0));if(w>0&&!can(UID,P.MSG))return toast(t('slow')+' '+Math.ceil(w/1000),1);LAST[ref]=Date.now()}
+ if(me.rl&&Math.random()<.4){ev('http','429',{retry_after:2});return toast(t('rl'),1)}
+ $('#inp').value='';UI.att=null;attR();UI.fresh=1;const o={id:nid(),u:UID,t:v,ts:Date.now()};if(att)o.att=att;mut(()=>getList(ref).push(o));ev('send','MESSAGE_CREATE',{ref})}
+
+/* friends */
+function relSet(id,f){load();const a=ME(),b=U(id);if(!b)return;
+ if(f==='fr'){if(a.fr.includes(id)){a.fr=a.fr.filter(x=>x!==id);b.fr=b.fr.filter(x=>x!==UID)}else if(a.out.includes(id))return toast(t('alreadysent'));else if(a.inc.includes(id))return accFr(id);
+  else{if(!b.pv.fr||b.bl.includes(UID)||a.bl.includes(id))return toast(t('frclosed'),1);a.out.push(id);b.inc.push(UID);toast(t('reqsent'))}}
+ else{a[f]=a[f].includes(id)?a[f].filter(x=>x!==id):[...a[f],id];if(f==='bl'&&a.bl.includes(id)){a.fr=a.fr.filter(x=>x!==id);b.fr=b.fr.filter(x=>x!==UID);a.inc=a.inc.filter(x=>x!==id);a.out=a.out.filter(x=>x!==id)}toast(t('done'))}
+ save();render()}
+function addFr(){const n=$('#afn').value.trim().toLowerCase();load();const u=Object.values(DB.users).find(x=>x.name.toLowerCase()===n);if(!u||u.id===UID)return toast(t('nouser'),1);if(ME().fr.includes(u.id))return toast(t('already'));relSet(u.id,'fr');$('#afn')&&($('#afn').value='')}
+
+/* ---------- forum ---------- */
+const tagChip=g=>g?`<span class="chip" style="--c:${g.color}">${g.emoji||''} ${esc(g.name)}</span>`:'';
+function forum(){const g=G(),c=chan(),l=g.posts[c.id]=g.posts[c.id]||[],tags=c.tags||[],box=$('#msgs'),mod=can(UID,P.MSG);
+ if(UI.post){const p=l.find(x=>x.id===UI.post);if(!p){UI.post=null;return forum()}
+  box.innerHTML=`<div class="fhead"><div class="row"><button class="g" onclick="UI.post=null;forum()">← ${t('back')}</button><span style="flex:1"></span><button class="g" onclick="fLike('${p.id}')">${(p.likes||[]).includes(UID)?'❤️':'🤍'} ${(p.likes||[]).length}</button>${mod?`<button class="g" onclick="fFlag('${p.id}','pin')">${p.pin?'📌 ✓':'📌'}</button><button class="g" onclick="fFlag('${p.id}','lock')">${p.lock?'🔒 ✓':'🔓'}</button>`:''}${(p.u===UID||mod)?`<button class="r" onclick="delPost('${p.id}')">${t('del')}</button>`:''}</div><h2 style="margin:8px 0">${p.pin?'📌 ':''}${p.lock?'🔒 ':''}${esc(p.title)}</h2><div class="chips">${(p.tags||[]).map(i=>tagChip(tags.find(x=>x.id===i))).join('')}</div></div>`+
+   msgHtml({u:p.u,t:p.body,ts:p.ts,id:p.id},null,null,'')+p.replies.filter(x=>!hidden(x)).map((x,i,a)=>msgHtml(x,null,a[i-1]||{u:'',ts:0},`delRe('${p.id}','${x.id}')`)).join('')+(p.lock?`<p class="mu">🔒 ${t('locked')}</p>`:`<div class="row"><input id="rp" placeholder="${t('reply')}" onkeydown="if(event.key==='Enter')reply('${p.id}')"><button onclick="reply('${p.id}')">${t('send')}</button></div>`);return}
+ const q=(UI.fs||'').toLowerCase(),ft=UI.ft||[];let ls=l.filter(p=>!hidden(p)&&(!q||(p.title+p.body).toLowerCase().includes(q))&&ft.every(i=>(p.tags||[]).includes(i)));
+ const last=p=>p.replies.length?p.replies.at(-1).ts:p.ts;ls.sort((a,b)=>(b.pin?1:0)-(a.pin?1:0)||(UI.fsort==='top'?(b.likes||[]).length-(a.likes||[]).length:UI.fsort==='act'?last(b)-last(a):b.ts-a.ts));
+ box.innerHTML=`<div class="fhead"><div class="row"><h2 style="margin:0;flex:1">${ICON.forum} ${esc(c.name)}</h2><button onclick="newPost()">＋ ${t('newpost')}</button></div><div class="row"><input placeholder="${t('search')}" value="${esc(UI.fs||'')}" oninput="UI.fs=this.value;forum();$('.fhead input')&&0" style="max-width:260px"><select onchange="UI.fsort=this.value;forum()" style="width:auto">${[['new','sort_new'],['act','sort_act'],['top','sort_top']].map(([k,l])=>`<option value="${k}" ${UI.fsort===k?'selected':''}>${t(l)}</option>`).join('')}</select></div>${tags.length?`<div class="chips">${tags.map(g=>`<span style="cursor:pointer;opacity:${ft.includes(g.id)?1:.6}" onclick="fTag('${g.id}')">${tagChip(g)}</span>`).join('')}</div>`:''}</div>`+
+  (ls.length?ls.map(p=>{const a=U(p.u);return `<div class="fcard ${p.pin?'pin':''}" onclick="UI.post='${p.id}';forum()">${a?av(a,40):''}<div style="flex:1;min-width:0"><div class="ft2">${p.pin?'📌 ':''}${p.lock?'🔒 ':''}${esc(p.title)}</div><div class="mu fex">${esc(p.body.slice(0,140))}</div><div class="chips" style="margin-top:6px">${(p.tags||[]).map(i=>tagChip(tags.find(x=>x.id===i))).join('')}</div><small>${esc(a?nm(a):'?')} · ${new Date(last(p)).toLocaleString(L,{dateStyle:'short',timeStyle:'short'})}</small></div><div class="fst"><span>💬 ${p.replies.length}</span><span>❤️ ${(p.likes||[]).length}</span></div></div>`}).join(''):empty('💬',t('nopost')))}
+function fTag(id){UI.ft=(UI.ft||[]).includes(id)?UI.ft.filter(x=>x!==id):[...(UI.ft||[]),id];forum()}
+function newPost(){if(!chPerm(UID,chan(),'send'))return toast(t('send403'),1);UI.nt=[];const tags=chan().tags||[];open(`<h2>${t('newpost')}</h2><div class="row"><input id="pt" placeholder="${t('ptitle')}"></div><div class="row"><textarea id="pb" rows="5" placeholder="${t('pbody')}"></textarea></div>${tags.length?`<h5>${t('tags')}</h5><div class="chips" id="ptg">${tags.map(g=>`<span style="cursor:pointer" id="tg${g.id}" onclick="tgSel('${g.id}')">${tagChip(g)}</span>`).join('')}</div>`:''}<div class="row"><button onclick="mkPost()">${t('create')}</button></div>`)}
+function tgSel(id){const a=UI.nt,i=a.indexOf(id);if(i<0&&a.length>=3)return;i<0?a.push(id):a.splice(i,1);(chan().tags||[]).forEach(g=>{const e=$('#tg'+g.id);if(e)e.style.opacity=a.includes(g.id)?1:.45})}
+function mkPost(){const ti=$('#pt').value.trim(),b=$('#pb').value,cid=chan().id,tg=[...UI.nt];if(!ti)return;if(chan().reqTag&&!tg.length)return toast(t('needtag'),1);mut(()=>{const l=G().posts[cid]=G().posts[cid]||[];l.unshift({id:nid(),u:UID,title:ti,body:b,ts:Date.now(),replies:[],tags:tg,likes:[]})});closeM();ev('send','THREAD_CREATE',{title:ti})}
+function reply(pid){const cid=chan().id,v=$('#rp').value.trim();if(!v)return;if(!chPerm(UID,chan(),'send'))return toast(t('send403'),1);mut(()=>G().posts[cid].find(p=>p.id===pid).replies.push({id:nid(),u:UID,t:v,ts:Date.now()}))}
+function fLike(pid){const cid=chan().id;mut(()=>{const p=G().posts[cid].find(x=>x.id===pid);p.likes=p.likes||[];const i=p.likes.indexOf(UID);i<0?p.likes.push(UID):p.likes.splice(i,1)})}
+function fFlag(pid,k){if(!need(P.MSG))return;const cid=chan().id;mut(()=>{const p=G().posts[cid].find(x=>x.id===pid);p[k]=!p[k];audit('THREAD_'+k.toUpperCase(),p.title)})}
+function delPost(pid){const cid=chan().id;mut(()=>{G().posts[cid]=G().posts[cid].filter(p=>p.id!==pid);audit('THREAD_DELETE')});UI.post=null;render()}
+function delRe(pid,rid){const cid=chan().id;mut(()=>{const p=G().posts[cid].find(x=>x.id===pid);p.replies=p.replies.filter(x=>x.id!==rid)})}
+
+/* ---------- user settings ---------- */
+const swr=(l,d,chk,fn)=>`<div class="row"><div style="flex:1"><b>${t(l)}</b>${d?`<div class="mu" style="font-size:13px">${t(d)}</div>`:''}</div>${sw(chk,fn)}</div>`;
+function usrSet(tab){const m=ME();let b='';
+ if(tab==='acct'){const f=(l,i,v,ty)=>`<div class="row"><label style="width:110px">${t(l)}</label><input id="${i}" type="${ty||'text'}" value="${esc(v)}" oninput="prevUpd()"></div>`,an=canAnim(m);
+  b=`<h2>${t('acct')}</h2><div class="pgrid"><div>`+f('name','f1',m.name)+f('pron','f7',m.pron||'')+f('custom','f3',m.custom)+f('bio','f4',m.bio||'')+f('avatar','f5',m.color,'color')+f('banner','f6',m.banner,'color')+f('banner2','f8',m.banner2||m.banner,'color')+`<div class="row"><label style="width:110px">${t('status')}</label><select id="f2" onchange="prevUpd()">${['online','idle','dnd','invisible'].map(k=>`<option value="${k}" ${m.status===k?'selected':''}>${t(k)}</option>`).join('')}</select></div>
+  <div class="row"><button class="g" onclick="pickFor('av',()=>usrSet('acct'))">🖼 ${t('avatar_img')}</button>${an?`<button class="g" onclick="urlFor('av',()=>usrSet('acct'))">🔗</button>`:''}<button class="g" onclick="clrImg('av',()=>usrSet('acct'))">✕</button></div>
+  <div class="row"><button class="g" onclick="pickFor('bn',()=>usrSet('acct'))">🏞 ${t('banner_img')}</button>${an?`<button class="g" onclick="urlFor('bn',()=>usrSet('acct'))">🔗</button>`:''}<button class="g" onclick="clrImg('bn',()=>usrSet('acct'))">✕</button></div>
+  <small class="mu">${an?t('animok'):t('animno')}</small><div class="row"><button onclick="saveProf()">${t('save')}</button></div></div><div id="pv" class="pvw">${pcard(m)}</div></div>`}
+ if(tab==='aur'){const free=pulseFree(UID),fb=noAur(m);b=`<h2 class="gold">✨ Aurum</h2><div class="aurbox"><b>${aur(m)?'✅ '+t('aur_on')+' · '+(m.aurum.until?t('until')+' '+untilTxt(m.aurum):t('forever')):fb?'⛔ '+t('forbidden')+' '+untilTxt(m.noAurum):t('aur_off')}</b><p class="mu">${t('aur_how')}</p></div><h5>${t('perks')}</h5><ul class="perks"><li>${t('pk1')}</li><li>${t('pk2')}</li><li>${t('pk3')}</li><li>${t('pk4')}</li></ul>
+  <h5>Pulse — ${t('free')}: ${free}</h5>`+Object.values(DB.srv).filter(s=>s.mem[UID]).map(s=>`<div class="row"><span style="flex:1">${esc(s.name)} <small>Lv${svLvl(s)} · ${(s.pulses||{})[UID]||0}</small></span><button class="g" ${free>0?'':'disabled'} onclick="pulse('${s.id}',1)">＋</button><button class="g" onclick="pulse('${s.id}',-1)" ${(s.pulses||{})[UID]?'':'disabled'}>－</button></div>`).join('')}
+ if(tab==='notif'){const n=m.nf;b=`<h2>${t('notif')}</h2>`+swr('n_sound','',n.sound,"nf('sound',this.checked)")+swr('n_desk','n_deskd',n.desk,"nfDesk(this.checked)")+swr('n_dm','',n.dm,"nf('dm',this.checked)")+swr('n_ping','',n.ping,"nf('ping',this.checked)")+swr('n_every','',n.every,"nf('every',this.checked)")+`<div class="row"><button onclick="beep();toast('🔔 '+t('n_test'))">🔊 ${t('n_test')}</button></div>`}
+ if(tab==='priv')b=`<h2>${t('privacy')}</h2>`+swr('pv_fr','',m.pv.fr,"pvSet('fr',this.checked)")+swr('pv_dm','',m.pv.dm,"pvSet('dm',this.checked)")+`<div class="row"><div style="flex:1"><b>${t('status')}</b></div><select onchange="mut(()=>{ME().status=this.value})">${['online','idle','dnd','invisible'].map(k=>`<option value="${k}" ${m.status===k?'selected':''}>${t(k)}</option>`).join('')}</select></div>`;
+ if(tab==='look'){b=`<h2>${t('look')}</h2><h5>${t('theme')}</h5>`+['dark','midnight','light'].map(k=>`<div class="th ${m.theme===k?'on':''}" onclick="setPref('theme','${k}','look')">${t('th_'+k)}</div>`).join('')+`<h5>${t('accent')}</h5>`+COL.map(c=>`<span class="dot ${m.accent===c?'on':''}" style="background:${c}" onclick="setPref('accent','${c}','look')"></span>`).join('')+`<h5>${t('access')}</h5><div class="row"><label style="width:130px">${t('fsize')} ${m.ui.fs}px</label><input type="range" min="13" max="19" value="${m.ui.fs}" oninput="uiSet('fs',+this.value)"></div>`+swr('compact','',m.ui.cp,"uiSet('cp',this.checked?1:0)")+swr('motion','',m.ui.rm,"uiSet('rm',this.checked?1:0)")}
+ if(tab==='voice'){const v=m.vs;b=`<h2>${t('voice')}</h2><div class="row"><label style="width:150px">${t('v_in')}</label><select id="vdev" onchange="vsSet('dev',this.value)"><option value="">${t('default')}</option></select></div><div class="row"><label style="width:150px">${t('v_vol')} ${Math.round((v.vol??1)*100)}%</label><input type="range" min="0" max="100" value="${Math.round((v.vol??1)*100)}" onchange="vsSet('vol',this.value/100);usrSet('voice')"></div>`+swr('v_ns','',v.ns!==0,"vsSet('ns',this.checked?1:0)")+swr('v_echo','',v.echo!==0,"vsSet('echo',this.checked?1:0)")+`<div class="row"><button onclick="micTest()">🎙 ${t('v_mic')}</button><div class="meter"><div id="mtr"></div></div></div><small class="mu">${t('v_note')}</small>`;setTimeout(fillDev,0)}
+ if(tab==='support'){UI.tk=null;b=`<h2>${t('support')}</h2>`+tkHtml(0)}
+ if(tab==='accts'){b=`<h2>${t('accts')}</h2><h5>${t('savedacc')}</h5>`+saved().filter(i=>DB.users[i]).map(i=>`<div class="fr">${av(DB.users[i],36)}<div class="dn"><b>${esc(DB.users[i].name)}</b>${i===UID?`<small>${t('current')}</small>`:''}</div>${i===UID?'':`<button onclick="switchTo('${i}')">${t('switch')}</button>`}<button class="g" onclick="rmSaved('${i}');usrSet('accts')">${t('forget')}</button></div>`).join('')+`<div class="row"><button onclick="addAcct()">＋ ${t('addacct')}</button></div>
+  <h5>${t('devaccess')}</h5>${rank(m)>=4?`<p class="gold">✅ ${t('devon')}</p>`:`<div class="row"><input id="dcode" type="password" placeholder="XXXXX-XXXXX-…"><button onclick="devUnlock($('#dcode').value)">${t('unlock')}</button></div>`}
+  <h5 style="color:var(--rd)">${t('danger')}</h5><div class="row"><input id="dpw" type="password" placeholder="${t('password')}"><button class="r" onclick="delAcct()">${t('delacct')}</button></div>`}
+ if(tab==='lang')b=`<h2>${t('lang')}</h2><div class="row"><select onchange="L=this.value;localStorage.setItem('ae_lang',L);setPref('lang',L,'lang')"><option value="ru" ${L==='ru'?'selected':''}>Русский</option><option value="en" ${L==='en'?'selected':''}>English</option></select></div>`;
+ if(tab==='dev'){b=`<h2>${t('devs')}</h2>`+swr('devmode','devdesc',m.dev,"setPref('dev',this.checked,'dev')")+swr('test','testdesc',m.test,"setPref('test',this.checked,'dev')")+swr('rlsim','',m.rl,"setPref('rl',this.checked,'dev')");
+  if(m.dev){b+=`<h5>${t('events')}</h5><div id="log">${esc(evlog.join('\n'))}</div>`;if(UI.v!=='home'){const g=G();b+=`<h5>${t('inspect')} — ${esc(g.name)}</h5>`+PL.map(k=>`<div class="row"><span style="flex:1">${t('p_'+k)}</span><span>${can(UID,P[k])?'✅':'❌'}</span></div>`).join('')}}}
+ const tabs=[['acct','👤 '+t('acct')],['aur','✨ Aurum'],['notif','🔔 '+t('notif')],['priv','🔒 '+t('privacy')],['look','🎨 '+t('look')],['voice','🎙 '+t('voice')],['support','🎫 '+t('support')],['accts','🗂 '+t('accts')],['lang','🌐 '+t('lang')],['dev','&lt;/&gt; '+t('devs')]];
+ open(shell(tabs,tab,'usrSet',b,`<div class="nvi" style="color:var(--rd);margin-top:16px" onclick="logout()">⎋ ${t('logout')}</div>`),'wide')}
+function prevUpd(){$('#pv').innerHTML=pcard({...ME(),...profVals()})}
+const nf=(k,v)=>mut(()=>{ME().nf[k]=v?1:0}),pvSet=(k,v)=>mut(()=>{ME().pv[k]=v?1:0}),vsSet=(k,v)=>mut(()=>{ME().vs[k]=v}),uiSet=(k,v)=>{mut(()=>{ME().ui[k]=v});if(k==='fs')return};
+function nfDesk(on){if(on&&window.Notification&&Notification.permission!=='granted')Notification.requestPermission();nf('desk',on)}
+function pulse(sid,d){mut(()=>{const g=DB.srv[sid];g.pulses=g.pulses||{};if(d>0&&pulseFree(UID)<=0)return;g.pulses[UID]=Math.max(0,(g.pulses[UID]||0)+d)});usrSet('aur')}
+async function fillDev(){try{const d=await navigator.mediaDevices.enumerateDevices(),s=$('#vdev');if(!s)return;s.innerHTML=`<option value="">${t('default')}</option>`+d.filter(x=>x.kind==='audioinput').map(x=>`<option value="${esc(x.deviceId)}" ${ME().vs.dev===x.deviceId?'selected':''}>${esc(x.label||'Mic')}</option>`).join('')}catch(e){}}
+async function micTest(){try{const s=await navigator.mediaDevices.getUserMedia({audio:true}),c=new AudioContext(),a=c.createAnalyser();c.createMediaStreamSource(s).connect(a);const d=new Uint8Array(a.fftSize);fillDev();const iv=setInterval(()=>{const el=$('#mtr');if(!el){clearInterval(iv);s.getTracks().forEach(x=>x.stop());c.close();return}a.getByteTimeDomainData(d);let m=0;d.forEach(x=>m=Math.max(m,Math.abs(x-128)));el.style.width=Math.min(100,m*2.2)+'%'},80)}catch(e){toast(t('micerr'),1)}}
+function applyPrefs(){const u=ME().ui||{};document.body.style.fontSize=(u.fs||15)+'px';document.body.classList.toggle('cp',!!u.cp);document.body.classList.toggle('rm',!!u.rm)}
+
+/* ---------- server settings ---------- */
+function srvSet(tab){const g=G();let b='';
+ if(tab==='ov'){const lv=svLvl(g),n=svPulses(g);b=`<h2>${t('ov')}</h2><div class="row"><label style="width:110px">${t('srvname')}</label><input id="gn" value="${esc(g.name)}"></div><div class="row"><label style="width:110px">${t('desc')}</label><input id="gd" value="${esc(g.desc||'')}"></div><div class="row"><button onclick="saveOv()">${t('save')}</button></div>
+  <h5>${t('icon')} / ${t('banner_img')}</h5><div class="row"><button class="g" onclick="pickFor('si',()=>srvSet('ov'))">🖼 ${t('icon')}</button><button class="g" onclick="clrImg('si',()=>srvSet('ov'))">✕</button><button class="g" onclick="pickFor('sb',()=>srvSet('ov'))">🏞 ${t('banner_img')}</button><button class="g" onclick="clrImg('sb',()=>srvSet('ov'))">✕</button></div><small class="mu">${svAnim(g)?t('animok'):t('srv_anim')}</small>
+  <h5>Pulse</h5><p>Lv${lv} · ${n} ${t('pulses')} <small class="mu">(2 → Lv1 · 7 → Lv2 · 14 → Lv3)</small></p>`+(ME().dev?`<div class="row"><button class="g" onclick="copy('${g.id}')">🆔 ${g.id}</button></div>`:'')}
+ if(tab==='roles')b=rolesTab();
+ if(tab==='ch')b=`<div class="row"><button onclick="mkCat()">＋ ${t('mkcat')}</button><button onclick="mkChannel()">＋ ${t('mkch')}</button></div>`+g.cats.map(k=>`<div class="row"><b>▾</b><input value="${esc(k.name)}" onchange="catName('${k.id}',this.value)"><button class="r" onclick="delCat('${k.id}')">✕</button></div>`+g.ch.filter(c=>c.cat===k.id).map(chRow).join('')).join('')+g.ch.filter(c=>!g.cats.find(k=>k.id===c.cat)).map(chRow).join('');
+ if(tab==='mem')b=Object.keys(g.mem).map(U).filter(Boolean).map(u=>{const tg=above(UID,u.id),r=g.mem[u.id];return `<div class="fr" oncontextmenu="mctx(event,'${u.id}')">${av(u,36)}<div class="dn"><b>${esc(nm(u))}</b><small>${g.roles.filter(x=>r.roles.includes(x.id)).map(x=>esc(x.name)).join(', ')}${r.to>Date.now()?' · ⏳':''}</small></div><div class="acts">${tg&&can(UID,P.TO)?`<span title="${t('to')}" onclick="memAct('${u.id}','to')">⏳</span>`:''}${tg&&can(UID,P.KICK)?`<span title="${t('kick')}" onclick="memAct('${u.id}','kick')">👢</span>`:''}${tg&&can(UID,P.BAN)?`<span title="${t('ban')}" onclick="memAct('${u.id}','ban')">🔨</span>`:''}</div></div>`}).join('');
+ if(tab==='pulse'){const lv=svLvl(g),n=svPulses(g),free=pulseFree(UID);b=`<h2>⚡ Pulse</h2><div class="aurbox"><b>Lv${lv}</b> · ${n} ${t('pulses')}<div class="bar"><div style="width:${Math.min(100,n/14*100)}%"></div></div></div><ul class="perks"><li>Lv1 — ${t('lv1')}</li><li>Lv2 — ${t('lv2')}</li><li>Lv3 — ${t('lv3')}</li></ul><div class="row"><button ${free>0?'':'disabled'} onclick="pulse('${g.id}',1);srvSet('pulse')">⚡ ${t('applypulse')} (${free})</button></div><h5>${t('boosters')}</h5>`+(Object.entries(g.pulses||{}).filter(([u,c])=>c&&U(u)).map(([u,c])=>`<div class="row">${av(U(u),28)}<span>${esc(U(u).name)}</span><small>×${c}${aur(U(u))?'':' · '+t('expired')}</small></div>`).join('')||`<p class="mu">${t('none')}</p>`)}
+ if(tab==='inv')b=`<button onclick="mkInvite();srvSet('inv')">＋ ${t('mkinv')}</button>`+(Object.entries(g.invites).map(([c,i])=>`<div class="row"><code style="flex:1">aethra.gg/invite/${c}</code><small>${esc(U(i.by)?.name||'')} · ${i.uses}</small><button class="g" onclick="copy('aethra.gg/invite/${c}')">⧉</button><button class="r" onclick="revInv('${c}')">${t('revoke')}</button></div>`).join('')||`<p class="mu">${t('none')}</p>`);
+ if(tab==='bans')b=g.bans.map(u=>`<div class="row"><span style="flex:1">${esc(U(u)?.name||u)}</span><button class="g" onclick="unban('${u}')">${t('unban')}</button></div>`).join('')||`<p class="mu">${t('none')}</p>`;
+ if(tab==='audit')b=g.audit.slice(0,40).map(a=>`<div class="mu" style="font-size:13px">${a.ts} · <b>${esc(a.by)}</b> → ${a.a} ${esc(a.tg)}</div>`).join('')||`<p class="mu">${t('none')}</p>`;
+ if(tab==='evs')b=`<button onclick="mkEvent();srvSet('evs')">＋ ${t('mkevent')}</button>`+(g.events.map(e=>`<div class="row"><span style="flex:1">📅 ${esc(e.name)} <small>${new Date(e.ts).toLocaleDateString(L)}</small></span><button class="r" onclick="evDel('${e.id}')">✕</button></div>`).join('')||`<p class="mu">${t('none')}</p>`);
+ open(shell([['ov','⚙️ '+t('ov')],['roles','🏷 '+t('rls')],['ch','# '+t('chs')],['mem','👥 '+t('members')],['pulse','⚡ Pulse'],['inv','🔗 '+t('invs')],['evs','📅 '+t('evs')],['bans','🔨 '+t('bans')],['audit','📜 '+t('audit')]],tab,'srvSet',`<h3 style="margin:0 0 10px">${esc(g.name)}</h3>`+b),'wide')}
+function saveOv(){if(!need(P.CH))return;const a=$('#gn').value.trim(),d=$('#gd').value;mut(()=>{G().name=a||G().name;G().desc=d;audit('GUILD_UPDATE')});srvSet('ov');toast(t('saved'))}
+function evDel(id){if(!need(P.CH))return;mut(()=>{G().events=G().events.filter(x=>x.id!==id)});srvSet('evs')}
+function memAct(uid,a){const t0=G().mem[uid];if(!above(UID,uid))return;mut(()=>{const g=G(),r=g.mem[uid];if(a==='to'){r.to=r.to>Date.now()?0:Date.now()+6e4;audit('MEMBER_TIMEOUT',U(uid).name)}else{delete g.mem[uid];if(a==='ban')g.bans.push(uid);audit('MEMBER_'+a.toUpperCase(),U(uid).name)}});srvSet('mem')}
+const chRow=c=>`<div class="row" style="margin-left:18px"><span>${ICON[c.type]}</span><input value="${esc(c.name)}" onchange="upCh('${c.id}','name',this.value,1)"><button class="g" onclick="chSet('${c.id}')">⚙️ ${t('perms')}</button><button class="r" onclick="delCh('${c.id}')">✕</button></div>`;
+function upCh(id,f,v,ref){if(!need(P.CH))return;mut(()=>{G().ch.find(c=>c.id===id)[f]=v;audit('CHANNEL_UPDATE')});if(ref===2)chSet(id)}
+function delCh(id){if(!need(P.CH))return;mut(()=>{const g=G();g.ch=g.ch.filter(c=>c.id!==id);audit('CHANNEL_DELETE')});srvSet('ch')}
+function catName(id,v){if(!need(P.CH))return;mut(()=>{G().cats.find(x=>x.id===id).name=v})}
+function delCat(id){if(!need(P.CH))return;mut(()=>{const g=G();g.ch.forEach(c=>{if(c.cat===id)c.cat=null});g.cats=g.cats.filter(k=>k.id!==id)});srvSet('ch')}
+function owCycle(cid,rid,k){if(!need(P.CH))return;mut(()=>{const c=G().ch.find(x=>x.id===cid);c.ow=c.ow||{};const o=c.ow[rid]=c.ow[rid]||{},v=o[k];if(v===undefined)o[k]=1;else if(v===1)o[k]=0;else delete o[k]});chSet(cid)}
+function chSet(cid){const g=G(),c=g.ch.find(x=>x.id===cid);if(!c)return;if(!need(P.CH))return;const ks=['view','send','attach','ping'],rows=[{id:'e',name:'@everyone',color:'#b5bac1'},...g.roles];
+ const cell=(r,k)=>{const v=c.ow&&c.ow[r]&&c.ow[r][k];return `<td><button class="tri ${v===1?'ok':v===0?'no':''}" onclick="owCycle('${cid}','${r}','${k}')">${v===1?'✔':v===0?'✖':'—'}</button></td>`};
+ open(`<h2>${ICON[c.type]} ${esc(c.name)}</h2><div class="row"><input value="${esc(c.name)}" onchange="upCh('${cid}','name',this.value,2)"><input type="number" min="0" style="width:90px" title="${t('slowm')}" value="${c.slow||0}" onchange="upCh('${cid}','slow',+this.value,2)"></div>
+ <div class="row"><label style="display:flex;gap:8px;align-items:center"><input type="checkbox" ${c.priv?'checked':''} onchange="upCh('${cid}','priv',this.checked?1:0,2)"> ${t('priv')}</label></div><h4>${t('chperm')}</h4><small class="mu">${t('tri_hint')}</small>
+ <div style="overflow-x:auto"><table class="ow"><tr><th></th>${ks.map(k=>`<th>${t('o_'+k)}</th>`).join('')}</tr>${rows.map(r=>`<tr><td style="color:${r.color}">${esc(r.name)}</td>${ks.map(k=>cell(r.id,k)).join('')}</tr>`).join('')}</table></div>`+
+ (c.type==='forum'?`<h4>${t('tags')}</h4><div class="chips">${(c.tags||[]).map(g=>`<span>${tagChip(g)} <b style="cursor:pointer" onclick="tagDel('${cid}','${g.id}')">✕</b></span>`).join('')}</div><div class="row"><input id="tn" placeholder="${t('tagname')}"><input id="te" placeholder="😀" style="width:70px"><input id="tc" type="color" value="#7c5cff"><button onclick="tagAdd('${cid}')">＋</button></div><label style="display:flex;gap:8px;align-items:center"><input type="checkbox" ${c.reqTag?'checked':''} onchange="upCh('${cid}','reqTag',this.checked?1:0,2)"> ${t('reqtag')}</label>`:'')+`<div class="row"><button class="r" onclick="delCh('${cid}');closeM()">${t('del')}</button></div>`)}
+function tagAdd(cid){const n=$('#tn').value.trim();if(!n)return;mut(()=>{const c=G().ch.find(x=>x.id===cid);(c.tags=c.tags||[]).push({id:nid(),name:n,emoji:$('#te').value,color:$('#tc').value})});chSet(cid)}
+function tagDel(cid,id){mut(()=>{const c=G().ch.find(x=>x.id===cid);c.tags=c.tags.filter(x=>x.id!==id)});chSet(cid)}
+function svProf(){const r=MR(UID);open(`<h2>${t('editprof')}</h2><div class="row"><label style="width:110px">${t('nick')}</label><input id="sp1" value="${esc(r.nick||'')}"></div><div class="row"><label style="width:110px">${t('nstyle')}</label><select id="sp2">${[['','ns_none'],['grad','ns_grad'],['neon','ns_neon'],['shimmer','ns_shimmer'],['rainbow','ns_rainbow']].map(([k,l])=>`<option value="${k}" ${(r.ns||'')===k?'selected':''}>${t(l)}</option>`).join('')}</select></div><div class="row"><button onclick="mut(()=>{MR(UID).nick=$('#sp1').value;MR(UID).ns=$('#sp2').value});closeM()">${t('save')}</button></div>`)}
+function rolesTab(){const g=G(),r=g.roles.find(x=>x.id===S_rsel)||g.roles[0];S_rsel=r.id;const ed=canEditRole(r),[cl,st]=[r.color2?`background:linear-gradient(90deg,${r.color},${r.color2});-webkit-background-clip:text;background-clip:text;color:transparent;`:`color:${r.color};`,r.glow?`filter:drop-shadow(0 0 5px ${r.color})`:''];
+ return `<div class="row"><button onclick="addRole()">＋ ${t('newrole')}</button><small>${t('hierhint')}</small></div><div class="rl2"><div>`+
+ g.roles.map(x=>`<div class="nvi ${x.id===r.id?'on':''}" onclick="S_rsel='${x.id}';srvSet('roles')"><span><span style="color:${x.color}">●</span> ${esc(x.name)} ${x.badge}</span><span class="ar"><a onclick="event.stopPropagation();mvRole('${x.id}',-1)">▲</a><a onclick="event.stopPropagation();mvRole('${x.id}',1)">▼</a></span></div>`).join('')+`</div><div>`+(ed?'':`<p style="color:var(--rd)">${t('noedit')}</p>`)+
+ `<fieldset ${ed?'':'disabled'} style="border:0;padding:0;margin:0"><div style="font-size:20px;font-weight:800;margin-bottom:8px;${cl}${st}">${esc(r.name)}</div>
+ <div class="row"><label style="width:120px">${t('rname')}</label><input value="${esc(r.name)}" onchange="setRole('name',this.value)"></div>
+ <div class="row"><label style="width:120px">${t('rcolor')}</label><input type="color" value="${r.color}" onchange="setRole('color',this.value)"><label style="margin-left:8px">${t('grad2')}</label><input type="color" value="${r.color2||r.color}" onchange="setRole('color2',this.value)"><button class="g" onclick="setRole('color2','')">✕</button></div>
+ <div class="row"><label style="width:120px">${t('rbadge')}</label><input value="${esc(r.badge)}" maxlength="4" onchange="setRole('badge',this.value)"></div>${swr('glow','',r.glow,"setRole('glow',this.checked?1:0)")}<h4>${t('perms')}</h4>`+
+ PL.map(k=>`<div class="row"><span style="flex:1">${t('p_'+k)}</span>${sw(r.perm&P[k],`setPerm(${P[k]},this.checked)`)}</div>`).join('')+`<div class="row"><button class="r" onclick="delRole('${r.id}')">${t('del')}</button></div></fieldset></div></div>`}
+function setRole(f,v){const r=selRole();if(!canEditRole(r))return;const id=r.id;mut(()=>{const x=G().roles.find(y=>y.id===id);if(v===''||v===0)delete x[f];else x[f]=v;audit('ROLE_UPDATE',x.name)});srvSet('roles')}
+
+/* ---------- staff: control center ---------- */
+const TKS={open:'🟢',pending:'🟡',closed:'⚫'};
+function tkHtml(staff){const all=plat().tickets;UI.tkCtx=staff?'staff':'user';UI.tf=UI.tf||'open';
+ if(UI.tk){const x=all.find(y=>y.id===UI.tk);if(x&&(staff||x.uid===UID)){const u=U(x.uid);
+  return `<div class="row"><button class="g" onclick="UI.tk=null;reTk()">← ${t('back')}</button><b style="flex:1">${TKS[x.status]} ${esc(x.subj)}</b><small>${esc(x.cat)}</small></div>`+(staff?`<div class="row"><small style="flex:1">${esc(u?.name||'?')} · ${x.as?t('assigned')+' '+esc(U(x.as)?.name||''):t('unassigned')}</small><button class="g" onclick="tkSet('${x.id}','as')">${t('take')}</button><select style="width:auto" onchange="tkSet('${x.id}','st',this.value)">${['open','pending','closed'].map(s=>`<option value="${s}" ${x.status===s?'selected':''}>${t('tk_'+s)}</option>`).join('')}</select></div>`:(x.status!=='closed'?`<div class="row"><button class="g" onclick="tkSet('${x.id}','st','closed')">${t('tk_closed')}</button></div>`:''))+
+   `<div class="tkm">${x.msgs.map(m=>`<div class="m"><div class="mb"><div class="mh"><b>${esc(U(m.u)?.name||'?')}</b>${m.staff?'<span class="tag">STAFF</span>':''}<span class="mt">${new Date(m.ts).toLocaleString(L)}</span></div><div class="tx">${fmt(m.t)}</div></div></div>`).join('')}</div>`+(x.status==='closed'&&!staff?'':`<div class="row"><input id="tkr" placeholder="${t('reply')}" onkeydown="if(event.key==='Enter')tkReply('${x.id}')"><button onclick="tkReply('${x.id}')">${t('send')}</button></div>`)}}
+ const l=all.filter(x=>staff||x.uid===UID).filter(x=>!staff||UI.tf==='all'||x.status===UI.tf||(UI.tf==='mine'&&x.as===UID)).sort((a,b)=>b.ts-a.ts);
+ return (staff?`<div class="row">${['open','pending','closed','mine','all'].map(f=>`<span class="tb2 ${UI.tf===f?'on':''}" onclick="UI.tf='${f}';reTk()">${t('tk_'+f)}</span>`).join('')}</div>`:`<div class="card2"><input id="tks" placeholder="${t('subject')}"><select id="tkc">${['c_gen','c_bug','c_acc','c_rep'].map(k=>`<option>${t(k)}</option>`).join('')}</select><textarea id="tkb" rows="3" placeholder="${t('describe')}"></textarea><button onclick="tkNew()">${t('newticket')}</button></div>`)+(l.length?l.map(x=>`<div class="card" onclick="UI.tk='${x.id}';reTk()">${TKS[x.status]} <b>${esc(x.subj)}</b> <small>${esc(U(x.uid)?.name||'?')} · ${x.msgs.length} · ${new Date(x.ts).toLocaleDateString(L)}</small></div>`).join(''):empty('🎫',t('notk')))}
+const reTk=()=>UI.tkCtx==='staff'?staffSet('tk'):usrSet('support');
+function tkNew(){const s=$('#tks').value.trim(),b=$('#tkb').value.trim();if(!s||!b)return;mut(()=>{plat().tickets.push({id:nid(),uid:UID,subj:s,cat:$('#tkc').value,status:'open',ts:Date.now(),msgs:[{u:UID,t:b,ts:Date.now()}]})});toast(t('done'));reTk()}
+function tkReply(id){const v=$('#tkr').value.trim();if(!v)return;mut(()=>{const x=plat().tickets.find(y=>y.id===id),st=rank(ME())>0&&x.uid!==UID;x.msgs.push({u:UID,t:v,ts:Date.now(),staff:st});x.status=st?'pending':'open'});reTk()}
+function tkSet(id,k,v){mut(()=>{const x=plat().tickets.find(y=>y.id===id);if(k==='as')x.as=UID;else x.status=v});reTk()}
+function staffSet(tab){const r=rank(ME());if(!r)return;let b='';
+ if(tab==='tk'){UI.tkCtx='staff';b=tkHtml(1)}
+ if(tab==='us'&&r>=2)b=`<input placeholder="${t('search')}" value="${esc(UI.uq||'')}" oninput="UI.uq=this.value;$('#ul').innerHTML=userRows()"><div id="ul">${userRows()}</div>`;
+ if(tab==='sv'&&r>=3)b=Object.values(DB.srv).map(s=>`<div class="fr"><div class="dn" style="flex:1"><b>${esc(s.name)}</b><small>${Object.keys(s.mem).length} ${t('members')} · ${esc(U(s.owner)?.name||'?')} · Lv${svLvl(s)}</small></div><button class="r" onclick="admDelSrv('${s.id}')">${t('del')}</button></div>`).join('')||empty('🏰',t('none'));
+ if(tab==='an'&&r>=3)b=`<h3>${t('announce')}</h3><div class="row"><input id="anx" value="${esc(plat().ann||'')}"><button onclick="mut(()=>{plat().ann=$('#anx').value});toast(t('done'))">${t('save')}</button></div>`;
+ if(tab==='ps'&&r>=4)b=posHtml();
+ if(tab==='bg'&&r>=4)b=bdgHtml();
+ const tabs=[['tk','🎫 '+t('tickets')]];if(r>=2)tabs.push(['us','👥 '+t('users')]);if(r>=3)tabs.push(['sv','🏰 '+t('servers')],['an','📢 '+t('announce')]);if(r>=4)tabs.push(['ps','🏷 '+t('positions')],['bg','🎖 '+t('badgesm')]);
+ open(shell(tabs,tab,'staffSet',`<h2>🛡 ${t('ctrl')} · ${esc(posName(posOf(ME())))}</h2>`+b),'wide')}
+function userRows(){const r=rank(ME()),q=(UI.uq||'').toLowerCase();return Object.values(DB.users).filter(u=>u.name.toLowerCase().includes(q)).slice(0,40).map(u=>{const ab=plat().bans[u.id],c2=r>rank(u)&&u.id!==UID;
+ return `<div class="fr" style="flex-wrap:wrap">${av(u,38)}<div class="dn" style="flex:1"><b>${esc(u.name)}${posOf(u)?` <span class="tag" style="background:${posOf(u).color}">${esc(posName(posOf(u)))}</span>`:''}</b><small>${aur(u)?'✨ '+untilTxt(u.aurum)+' · ':''}${noAur(u)?'⛔ '+untilTxt(u.noAurum)+' · ':''}${ab?'🚫 · ':''}${u.id}</small></div><div class="acts" style="flex-wrap:wrap">`+
+ (r>=2&&c2?`<span title="Aurum" onclick="aurModal('${u.id}')">✨</span>`:'')+(r>=3&&aur(u)?`<span title="${t('revoke')}" onclick="aurRevoke('${u.id}')">↩</span>`:'')+(r>=3&&c2?`<span title="${t('forbid')}" onclick="aurForbid('${u.id}')">⛔</span>`:'')+(r>=2&&c2?`<span title="${t('appban')}" onclick="appBan('${u.id}')">${ab?'♻':'🚫'}</span>`:'')+(r>=4?`<span title="${t('position')}" onclick="posAssign('${u.id}')">🏷</span><span title="${t('badgesm')}" onclick="bdgAssign('${u.id}')">🎖</span>`:'')+(r>=3&&c2?`<span title="${t('del')}" onclick="admDelUser('${u.id}')">🗑</span>`:'')+`</div></div>`}).join('')}
+const DUR=[[1,'1 '+'d'],[7,'7 d'],[30,'30 d'],[90,'90 d'],[365,'365 d'],[0,'∞']];
+const durSel=id=>`<select id="${id}" style="width:auto">${DUR.map(([d,l])=>`<option value="${d}">${d?l:t('forever')}</option>`).join('')}</select>`;
+function aurModal(uid){if(rank(ME())<2)return;const u=U(uid);open(`<h2>✨ Aurum — ${esc(u.name)}</h2>`+(noAur(u)?`<p style="color:var(--rd)">⛔ ${t('forbidden')} ${untilTxt(u.noAurum)}</p>`:`<div class="row">${durSel('ad')}<button onclick="aurGrant('${uid}')">${t('grant')}</button></div>`))}
+function aurGrant(uid){if(rank(ME())<2)return;const d=+$('#ad').value;mut(()=>{const u=U(uid);if(noAur(u))return;u.aurum={until:d?Date.now()+d*864e5:0,by:UID}});closeM();toast(t('done'));staffSet('us')}
+function aurRevoke(uid){if(rank(ME())<3)return toast(t('noperm'),1);mut(()=>{delete U(uid).aurum});staffSet('us')}
+function aurForbid(uid){if(rank(ME())<3)return;open(`<h2>⛔ ${t('forbid')} — ${esc(U(uid).name)}</h2><div class="row">${durSel('ad')}<button class="r" onclick="aurFb('${uid}',1)">${t('forbid')}</button><button class="g" onclick="aurFb('${uid}',0)">${t('allow')}</button></div>`)}
+function aurFb(uid,on){const d=+$('#ad').value;mut(()=>{const u=U(uid);if(on){u.noAurum={until:d?Date.now()+d*864e5:0};delete u.aurum}else delete u.noAurum});closeM();staffSet('us')}
+function appBan(uid){const r=rank(ME()),b=plat().bans[uid];if(b){mut(()=>{delete plat().bans[uid]});return staffSet('us')}const m=prompt(t('banmin'),'60');if(m===null)return;const n=Math.max(0,+m||0);if(!n&&r<3)return toast(t('noperm'),1);const why=prompt(t('reason'),'')||'';mut(()=>{plat().bans[uid]={until:n?Date.now()+n*6e4:0,reason:why,by:UID}});staffSet('us')}
+function admDelUser(uid){if(rank(ME())<3||!confirm(t('del')+' '+U(uid).name+'?'))return;purgeUser(uid);render();staffSet('us')}
+function admDelSrv(id){if(rank(ME())<3||!confirm(t('del')+'?'))return;mut(()=>{delete DB.srv[id]});staffSet('sv')}
+function posHtml(){const ps=Object.values(plat().pos);return `<h3>${t('positions')}</h3>`+ps.map(p=>`<div class="row"><span class="bdgi" style="--c1:${p.color};--c2:${p.color}">${ic(p.badge)}</span><input value="${esc(p.sys?posName(p):p.name)}" ${p.sys?'disabled':''} onchange="posUp('${p.id}','name',this.value)"><input type="color" value="${p.color}" onchange="posUp('${p.id}','color',this.value)"><span class="mu">R${p.rank}</span><button class="g" onclick="posImg('${p.id}')">🖼</button>${p.sys?'':`<button class="r" onclick="posDel('${p.id}')">✕</button>`}</div>`).join('')+`<h4>${t('newpos')}</h4><div class="row"><input id="pn" placeholder="${t('name')}"><select id="pr" style="width:auto">${[0,1,2,3].map(i=>`<option value="${i}">R${i}</option>`).join('')}</select><input id="pe" value="⭐" style="width:70px"><button onclick="posNew()">${t('create')}</button></div><small class="mu">${t('rank_hint')}</small>`}
+function posUp(id,f,v){if(rank(ME())<4)return;mut(()=>{plat().pos[id][f]=v});staffSet('ps')}
+function posImg(id){imgPick({w:96,png:1},d=>posUp(id,'badge',d))}
+function posDel(id){mut(()=>{delete plat().pos[id];Object.values(DB.users).forEach(u=>{if(u.pos===id)delete u.pos})});staffSet('ps')}
+function posNew(){const n=$('#pn').value.trim();if(!n)return;mut(()=>{const id='p'+nid();plat().pos[id]={id,name:n,badge:$('#pe').value||'⭐',color:COL[Math.floor(Math.random()*7)],rank:+$('#pr').value}});staffSet('ps')}
+function posAssign(uid){const u=U(uid);open(`<h2>🏷 ${esc(u.name)}</h2>`+['',...Object.keys(plat().pos)].map(id=>`<div class="card" onclick="mut(()=>{${id?`U('${uid}').pos='${id}'`:`delete U('${uid}').pos`}});closeM();staffSet('us')">${id?bdg(posName(plat().pos[id]),plat().pos[id].badge,plat().pos[id].color,plat().pos[id].color)+' '+esc(posName(plat().pos[id]))+' <small>R'+plat().pos[id].rank+'</small>':'—'}</div>`).join(''))}
+function bdgHtml(){const bs=Object.values(plat().badges);return `<h3>${t('badgesm')}</h3>`+bs.map(b=>`<div class="row">${bdg(b.name,b.img||b.emoji,b.color,b.color)}<span style="flex:1">${esc(b.name)}</span><button class="r" onclick="bdgDel('${b.id}')">✕</button></div>`).join('')+`<h4>${t('newbadge')}</h4><div class="row"><input id="bn" placeholder="${t('name')}"><input id="be" value="🏅" style="width:70px"><input id="bc" type="color" value="#7c5cff"></div><div class="row"><button class="g" onclick="bdgImg()">🖼 ${t('fromfile')}</button><button class="g" onclick="bdgUrl()">🔗 URL</button><button onclick="bdgNew()">${t('create')}</button></div><small class="mu">${UI.bimgTmp?'✅ '+t('imgready'):''}</small>`}
+function bdgImg(){imgPick({w:96,png:1},d=>{UI.bimgTmp=d;staffSet('bg')})}
+function bdgUrl(){const u=prompt('URL (https://…png)');if(u&&safeImg(u)){UI.bimgTmp=u;staffSet('bg')}}
+function bdgNew(){const n=$('#bn').value.trim();if(!n)return;const img=UI.bimgTmp,em=$('#be').value,c=$('#bc').value;UI.bimgTmp=null;mut(()=>{const id='b'+nid();plat().badges[id]={id,name:n,emoji:em,img,color:c}});staffSet('bg')}
+function bdgDel(id){mut(()=>{delete plat().badges[id];Object.values(DB.users).forEach(u=>u.gb=u.gb.filter(x=>x!==id))});staffSet('bg')}
+function bdgAssign(uid){const u=U(uid),bs=Object.values(plat().badges);open(`<h2>🎖 ${esc(u.name)}</h2>`+(bs.map(b=>`<div class="card" onclick="bdgTog('${uid}','${b.id}')">${u.gb.includes(b.id)?'☑':'☐'} ${bdg(b.name,b.img||b.emoji,b.color,b.color)} ${esc(b.name)}</div>`).join('')||`<p class="mu">${t('none')}</p>`))}
+function bdgTog(uid,id){mut(()=>{const u=U(uid);u.gb=u.gb.includes(id)?u.gb.filter(x=>x!==id):[...u.gb,id]});bdgAssign(uid)}
+
+/* ---------- gateway sim / wrappers / init ---------- */
+function gw(){clearInterval(timer);timer=setInterval(()=>{if(!UID||!ME()||!ME().test)return;const f=['PRESENCE_UPDATE','TYPING_START','GUILD_MEMBER_UPDATE','HEARTBEAT_ACK'];ev('recv',f[Math.floor(Math.random()*f.length)],{sim:1,seq:Date.now()%1e5})},2500)}
+function annR(){const a=plat().ann,e=$('#ann');if(e){e.style.display=a?'flex':'none';e.textContent=a?'📢 '+a:''}}
+const _render=render;render=function(){if(UID&&ME()){const b=plat().bans[UID];if(b&&(!b.until||b.until>Date.now())){logout();$('#ae').textContent=t('appbanned')+' '+(b.reason||'');return}applyPrefs()}_render();if(UID)annR()};
+const _mainR=mainR;mainR=function(){_mainR();if(UI.v!=='home'&&UI.ref&&UI.ref[0]==='c'){const cid=UI.ref.slice(2),me=ME();if(mentionCnt(G(),cid)){me.mread[cid]=Date.now();save();railR();sideR()}}};
+(function(){$('#main').insertAdjacentHTML('afterbegin','<div id="ann"></div>');$('#cmp').insertAdjacentHTML('beforebegin','<div id="attc" style="padding:0 16px"></div>');$('#cmp .box').insertAdjacentHTML('afterbegin','<span class="ib" onclick="attachPick()" style="margin-left:6px">📎</span>');$('#auth .ac').insertAdjacentHTML('beforeend','<div id="asv"></div>');
+ load();authText();try{UID=sessionStorage.getItem('ae_uid')}catch(e){}if(UID&&DB.users[UID])start();else UID=null})();
+
+</script>
+</body>
+</html>
